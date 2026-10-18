@@ -839,8 +839,9 @@
   .toast.error { background: var(--danger); }
 
   @media (max-width: 700px) {
-    .topbar { padding: 0 1rem; }
-    .topbar-nav { display: none; }
+    .topbar { padding: 0.5rem 1rem 0; height: auto; flex-wrap: wrap; row-gap: 6px; }
+    .topbar-nav { order: 3; width: 100%; overflow-x: auto; padding-bottom: 8px; }
+    .nav-btn { white-space: nowrap; }
     .content { padding: 1rem; }
     .grid-3, .grid-2 { grid-template-columns: 1fr; }
   }
@@ -853,6 +854,206 @@
 
   .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
   .empty-state-text { font-size: 15px; }
+
+  [hidden] { display: none !important; }
+
+  .card-header { flex-wrap: wrap; gap: 8px; }
+
+  .page-header.with-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .link-btn {
+    border: none;
+    background: none;
+    color: var(--accent);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .link-btn:hover { text-decoration: underline; }
+
+  /* ── OKUMA METNİ ── */
+  .seg {
+    display: inline-flex;
+    background: var(--surface2);
+    border-radius: var(--r-sm);
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .seg-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+  }
+
+  .seg-btn.active { background: white; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  .reading-help {
+    font-size: 13px;
+    color: var(--text2);
+    background: var(--surface2);
+    border-radius: var(--r-sm);
+    padding: 10px 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  .reading-text {
+    font-family: var(--font-d);
+    font-size: 1.35rem;
+    line-height: 2.1;
+    color: var(--text);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .reading-text p { margin-bottom: 1rem; }
+  .reading-text .w { cursor: pointer; border-radius: 4px; padding: 1px 2px; transition: background 0.15s; }
+  .reading-text .w:hover { background: var(--surface2); }
+  .reading-text .w.err { background: var(--danger-bg); color: var(--danger); text-decoration: line-through; }
+  .reading-text .w.last { background: var(--accent); color: white; }
+  .reading-text .w.after { color: var(--text3); }
+
+  /* ── SONUÇ GİRİŞİ ── */
+  .result-box {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: var(--surface2);
+    border-radius: var(--r);
+    text-align: center;
+  }
+
+  .result-hint { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+  .result-inputs { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .result-inputs label {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .result-inputs input {
+    width: 110px;
+    padding: 10px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    font-family: var(--font-d);
+    border: 2px solid var(--border2);
+    border-radius: var(--r-sm);
+    outline: none;
+  }
+
+  .result-inputs input:focus { border-color: var(--accent); }
+
+  .result-preview {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 14px 0;
+    font-size: 14px;
+    color: var(--text2);
+  }
+
+  .result-preview b { font-family: var(--font-d); font-size: 1.4rem; color: var(--accent); }
+
+  /* ── HEDEF ETİKETİ ── */
+  .norm-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .norm-pill.below { background: var(--warm-bg); color: #8A5523; }
+  .norm-pill.within { background: var(--accent-bg); color: var(--accent2); }
+  .norm-pill.above { background: var(--info-bg); color: var(--info); }
+
+  /* ── ÇİZGİ GRAFİK ── */
+  .line-chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .lc-grid { stroke: var(--border); stroke-width: 1; }
+  .lc-axis { font-size: 12px; fill: var(--text3); font-family: var(--font); }
+  .lc-band { fill: var(--accent-bg); opacity: 0.6; }
+  .lc-band-label { font-size: 11px; fill: var(--accent2); font-family: var(--font); font-weight: 600; }
+  .lc-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .lc-dot { fill: var(--accent); stroke: white; stroke-width: 2; }
+  .lc-hit { fill: transparent; cursor: pointer; }
+  .lc-value { font-size: 13px; font-weight: 600; fill: var(--text); font-family: var(--font); }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 8px;
+  }
+
+  .chart-legend i { display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .lg-line { width: 18px; height: 2px; background: var(--accent); }
+  .lg-band { width: 14px; height: 10px; background: var(--accent-bg); border-radius: 2px; }
+
+  .chart-tip {
+    position: fixed;
+    z-index: 10000;
+    background: var(--text);
+    color: white;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    pointer-events: none;
+    transform: translate(-50%, calc(-100% - 8px));
+    opacity: 0;
+    transition: opacity 0.12s;
+    max-width: 260px;
+  }
+
+  .chart-tip.show { opacity: 1; }
+
+  /* ── GEÇMİŞ ÖLÇÜM ── */
+  .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .form-row > .form-group { flex: 1; min-width: 130px; }
+  .form-hint { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  .bulk-example {
+    font-size: 12px;
+    color: var(--text2);
+    background: var(--surface2);
+    border-radius: var(--r-sm);
+    padding: 10px 12px;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+
+  .bulk-summary { font-size: 13px; color: var(--text2); margin: 0.5rem 0; }
+  .bulk-row { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .bulk-row > span:first-child { width: 95px; flex-shrink: 0; }
+  .bulk-row.bad { color: var(--danger); }
+
+  .reading-row { flex-wrap: wrap; }
+  .row-actions { display: flex; gap: 6px; align-items: center; margin-left: auto; }
 </style>
 </head>
 <body>
@@ -960,9 +1161,12 @@
 
     <!-- OKUMA TESTİ -->
     <div class="page" id="page-okuma">
-      <div class="page-header">
-        <div class="page-title">Okuma Testi</div>
-        <div class="page-subtitle">1 dakika süre ile okuma hızı ölçümü</div>
+      <div class="page-header with-action">
+        <div>
+          <div class="page-title">Okuma Testi</div>
+          <div class="page-subtitle">1 dakika süre ile okuma hızı ölçümü</div>
+        </div>
+        <button class="btn-sm" onclick="openPastReading()">+ Geçmiş Ölçüm Gir</button>
       </div>
       <div class="grid-2">
         <div class="card">
@@ -972,13 +1176,21 @@
           <div class="card-body">
             <div class="form-group">
               <label>Öğrenci</label>
-              <select id="timer-student-select">
+              <select id="timer-student-select" onchange="updateResultPreview()">
                 <option value="">— Seçin —</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Okunan Metin / Konu (isteğe bağlı)</label>
-              <input type="text" id="timer-topic" placeholder="örn: Masal – Üç Küçük Domuz" />
+              <label style="display:flex;justify-content:space-between;align-items:center;">
+                Okuma Metni
+                <button type="button" class="link-btn" onclick="openAddText()">+ Kendi metnini ekle</button>
+              </label>
+              <select id="timer-text-select" onchange="onTextSelect()"></select>
+              <div class="form-hint">Metin seçerseniz okunan kelime ve hata sayısı otomatik hesaplanır.</div>
+            </div>
+            <div class="form-group">
+              <label>Konu (isteğe bağlı)</label>
+              <input type="text" id="timer-topic" placeholder="Boş bırakılırsa metnin adı kullanılır" />
             </div>
             <div class="form-group">
               <label>Not (isteğe bağlı)</label>
@@ -1011,15 +1223,36 @@
               </div>
             </div>
             <div id="wpm-entry-section" style="display:none;">
-              <div class="wpm-input-row">
-                <div style="text-align:center">
-                  <div style="font-size:13px;color:var(--text2);margin-bottom:8px;">Okunan kelime sayısı:</div>
-                  <input type="number" id="wpm-count-input" min="0" max="500" placeholder="0" />
+              <div class="result-box">
+                <div class="result-hint" id="result-hint">Okunan kelime ve hata sayısını girin.</div>
+                <div class="result-inputs">
+                  <label>Okunan kelime
+                    <input type="number" id="wpm-count-input" min="0" max="500" placeholder="0" oninput="updateResultPreview()" />
+                  </label>
+                  <label>Hata
+                    <input type="number" id="wpm-error-input" min="0" max="500" placeholder="0" oninput="updateResultPreview()" />
+                  </label>
                 </div>
+                <div class="result-preview" id="result-preview"></div>
                 <button class="btn-save-wpm" onclick="saveWpmResult()">Kaydet ✓</button>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="card" id="reading-text-card" style="margin-top:1rem;" hidden>
+        <div class="card-header">
+          <span class="card-title" id="reading-text-title">Metin</span>
+          <div class="seg">
+            <button class="seg-btn active" id="mode-err" onclick="setTextMode('err')">Hata işaretle</button>
+            <button class="seg-btn" id="mode-last" onclick="setTextMode('last')">Son kelimeyi seç</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="reading-help" id="reading-help"></div>
+          <div class="reading-text" id="reading-text"></div>
+          <button class="btn-sm danger" id="delete-text-btn" onclick="deleteCustomText()" hidden>Bu metni sil</button>
         </div>
       </div>
 
@@ -1082,7 +1315,7 @@
 <div class="modal-overlay" id="modal-add-student">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Öğrenci Ekle</div>
+      <div class="modal-title" id="student-modal-title">Öğrenci Ekle</div>
       <button class="modal-close" onclick="closeModal('modal-add-student')">✕</button>
     </div>
     <div class="modal-body">
@@ -1091,13 +1324,15 @@
         <input type="text" id="new-student-name" placeholder="Öğrenci adı" />
       </div>
       <div class="form-group">
-        <label>Sınıf</label>
+        <label>Sınıf (şu anki)</label>
         <select id="new-student-class">
+          <option value="1. Sınıf">1. Sınıf</option>
           <option value="2. Sınıf">2. Sınıf</option>
           <option value="3. Sınıf">3. Sınıf</option>
           <option value="4. Sınıf" selected>4. Sınıf</option>
           <option value="5. Sınıf">5. Sınıf</option>
         </select>
+        <div class="form-hint">Geçmiş ölçümlerin hangi sınıfa ait olduğu buradan hesaplanır. Her eğitim yılı başında güncelleyin.</div>
       </div>
       <div class="form-group">
         <label>Okul</label>
@@ -1110,7 +1345,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-add-student')">İptal</button>
-      <button class="btn-sm accent" onclick="addStudent()">Ekle</button>
+      <button class="btn-sm accent" onclick="addStudent()" id="student-modal-save">Ekle</button>
     </div>
   </div>
 </div>
@@ -1152,6 +1387,104 @@
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-add-topic')">İptal</button>
       <button class="btn-sm accent" onclick="addTopic()">Ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- Past Reading -->
+<div class="modal-overlay" id="modal-past-reading">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-header">
+      <div class="modal-title" id="past-modal-title">Geçmiş Ölçüm Gir</div>
+      <button class="modal-close" onclick="closeModal('modal-past-reading')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+      <div class="form-group">
+        <label>Öğrenci</label>
+        <select id="past-student-select"></select>
+      </div>
+      <div class="tabs" id="past-tabs">
+        <button class="tab-btn active" id="past-tab-single" onclick="switchPastTab('single')">Tek ölçüm</button>
+        <button class="tab-btn" id="past-tab-bulk" onclick="switchPastTab('bulk')">Toplu (notlardan yapıştır)</button>
+      </div>
+
+      <div id="past-single">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tarih</label>
+            <input type="date" id="past-date" />
+          </div>
+          <div class="form-group">
+            <label>Okunan kelime (1 dk)</label>
+            <input type="number" id="past-total" min="1" max="400" placeholder="örn: 72" />
+          </div>
+          <div class="form-group">
+            <label>Hata (isteğe bağlı)</label>
+            <input type="number" id="past-errors" min="0" max="400" placeholder="—" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Metin / Konu (isteğe bağlı)</label>
+          <input type="text" id="past-topic" placeholder="örn: Ders kitabı s.45" />
+        </div>
+        <div class="form-group">
+          <label>Not (isteğe bağlı)</label>
+          <input type="text" id="past-note" placeholder="örn: Hece zorluğu var" />
+        </div>
+      </div>
+
+      <div id="past-bulk" hidden>
+        <div class="bulk-example">
+          Telefonunuzdaki notları aşağıya yapıştırın. Her satırda <strong>bir tarih</strong> ve <strong>okunan kelime sayısı</strong> olsun. Hata sayısı ve not isteğe bağlıdır. Örnekler:<br>
+          <code>12.09.2024 58</code><br>
+          <code>03/10/2024 - 64 kelime, 3 hata</code><br>
+          <code>15 Kasım 2024 70 kelime masal kitabı</code>
+        </div>
+        <div class="form-group">
+          <textarea id="past-bulk-input" rows="7" placeholder="Notlarınızı buraya yapıştırın…" oninput="renderBulkPreview()"></textarea>
+        </div>
+        <div id="past-bulk-preview"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-past-reading')">İptal</button>
+      <button class="btn-sm accent" onclick="savePastReading()" id="past-save-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Text -->
+<div class="modal-overlay" id="modal-add-text">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-header">
+      <div class="modal-title">Okuma Metni Ekle</div>
+      <button class="modal-close" onclick="closeModal('modal-add-text')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group" style="flex:2;">
+          <label>Metnin Adı</label>
+          <input type="text" id="text-title-input" placeholder="örn: Ders kitabı – Çınar Ağacı" />
+        </div>
+        <div class="form-group">
+          <label>Sınıf</label>
+          <select id="text-grade-input">
+            <option value="1">1. Sınıf</option>
+            <option value="2">2. Sınıf</option>
+            <option value="3">3. Sınıf</option>
+            <option value="4" selected>4. Sınıf</option>
+            <option value="5">5. Sınıf</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Metin</label>
+        <textarea id="text-body-input" rows="9" placeholder="Metni buraya yazın veya yapıştırın. Paragrafları boş satırla ayırın."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-add-text')">İptal</button>
+      <button class="btn-sm accent" onclick="addText()">Ekle</button>
     </div>
   </div>
 </div>
@@ -1230,6 +1563,146 @@ function esc(v) {
 // "Ali  Veli" gibi fazla boşluklu isimlerde de çalışır
 function initials(name, n = 2) {
   return String(name || '').split(/\s+/).filter(Boolean).map(w => w[0]).join('').substr(0, n).toUpperCase();
+}
+
+const DAY = 86400000;
+
+// ══════════════════════════════════════
+// OKUMA HEDEFLERİ
+// ══════════════════════════════════════
+// Sınıf düzeyine göre yaklaşık "doğru kelime / dakika" aralıkları.
+// Kesin bir standart değildir; ihtiyaca göre buradan değiştirilebilir.
+const NORMS = { 1: [40, 60], 2: [60, 80], 3: [80, 100], 4: [100, 120], 5: [110, 130] };
+
+function gradeNum(sinif) {
+  const m = /^(\d+)/.exec(sinif || '');
+  return m ? +m[1] : null;
+}
+
+// Eğitim yılı Eylül'de başlar: Ekim 2024 → 2024, Mart 2025 → 2024
+function schoolYear(ts) {
+  const d = new Date(ts);
+  return d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1;
+}
+
+// Öğrencinin şu anki sınıfından geriye doğru, verilen tarihteki sınıfını bulur
+function gradeAt(student, ts) {
+  const g = gradeNum(student && student.sinif);
+  if (!g) return null;
+  const at = g - (schoolYear(Date.now()) - schoolYear(ts));
+  return at >= 1 ? at : null;
+}
+
+function readingGrade(rd, student) {
+  return rd.grade || gradeAt(student, rd.date);
+}
+
+function normStatus(wpm, grade) {
+  const n = NORMS[grade];
+  if (!n || wpm == null) return null;
+  if (wpm < n[0]) return { cls: 'below', label: 'Hedefin altında' };
+  if (wpm > n[1]) return { cls: 'above', label: 'Hedefin üstünde' };
+  return { cls: 'within', label: 'Hedef aralığında' };
+}
+
+function normPill(wpm, grade) {
+  const st = normStatus(wpm, grade);
+  if (!st) return '';
+  const [lo, hi] = NORMS[grade];
+  return `<span class="norm-pill ${st.cls}" title="${grade}. sınıf için yaklaşık hedef: ${lo}–${hi} doğru kelime/dk">${st.label}</span>`;
+}
+
+function accuracyText(rd) {
+  if (rd.errors == null || !rd.total) return '';
+  return `${rd.errors} hata · %${Math.round((rd.total - rd.errors) / rd.total * 100)} doğruluk`;
+}
+
+// ══════════════════════════════════════
+// OKUMA METİNLERİ
+// ══════════════════════════════════════
+const BUILTIN_TEXTS = [
+  { id: 'b1a', grade: 1, title: 'Minik Kedi', body: `Ela'nın minik bir kedisi var. Kedinin adı Pamuk. Pamuk bembeyaz ve çok yumuşak. Sabah olunca Ela'nın yatağına atlar. Mır mır diye ses çıkarır. Ela gözlerini açar ve gülümser.
+
+Pamuk süt içmeyi çok sever. Ela ona her sabah bir kâse süt verir. Pamuk sütünü içer, sonra bıyıklarını yalar. Öğleden sonra güneşli pencerenin önünde uyur. Akşam olunca da yumakla oynar.
+
+Bazen Pamuk saklanır. Ela onu her yerde arar. Sonunda Pamuk'u dolabın içinde bulur. İkisi de çok güler. Ela ile Pamuk çok iyi iki arkadaştır.` },
+
+  { id: 'b1b', grade: 1, title: 'Bahçede Bir Gün', body: `Bugün hava çok güzel. Ali ile dedesi bahçeye çıktı. Dedesi eline küçük bir kürek aldı. Ali de sulama kabını aldı.
+
+Önce toprağı kazdılar. Sonra toprağa domates fideleri diktiler. Ali fideleri tek tek suladı. Bir arı geldi, çiçeğin üstüne kondu. Ali korkmadı, arıyı sessizce izledi.
+
+Dedesi, arıların bahçe için çok yararlı olduğunu söyledi. Akşam olunca ikisi de yoruldu ama çok mutluydular. Ali, domateslerin büyümesini sabırsızlıkla bekleyecek. Her sabah fideleri sulamaya söz verdi. Dedesi de ona küçük bir bahçe defteri hediye etti.` },
+
+  { id: 'b2a', grade: 2, title: 'Kayıp Şemsiye', body: `Yağmurlu bir sabahtı. Zeynep okula gitmek için evden çıktı. Elinde annesinin ona aldığı sarı şemsiye vardı. Şemsiyenin üstünde küçük ördek resimleri vardı. Zeynep bu şemsiyeyi çok seviyordu.
+
+Okula vardığında şemsiyesini kapının yanındaki askılığa astı. Gün boyunca derslerini dinledi, arkadaşlarıyla oyun oynadı. Okul bitince şemsiyesini almak için askılığa koştu. Ama şemsiye yerinde yoktu! Zeynep çok üzüldü. Gözleri doldu.
+
+O sırada sınıf arkadaşı Mert yanına geldi. Elinde sarı bir şemsiye tutuyordu. Mert, şemsiyenin rüzgârla yere düştüğünü, kimse basmasın diye onu öğretmene verdiğini anlattı. Zeynep çok sevindi ve Mert'e teşekkür etti. Eve dönerken ikisi aynı şemsiyenin altında yürüdüler. Yağmur yağıyordu ama ikisi de gülüyordu. O günden sonra Zeynep ile Mert çok iyi arkadaş oldular.` },
+
+  { id: 'b2b', grade: 2, title: 'Karınca ile Güvercin', body: `Sıcak bir yaz günüydü. Küçük bir karınca su içmek için derenin kenarına geldi. Eğilip suya uzanırken ayağı kaydı ve suya düştü. Akıntı onu hızla sürüklemeye başladı. Karınca çırpındı ama kıyıya bir türlü ulaşamadı.
+
+Ağacın dalında oturan bir güvercin karıncayı gördü. Hemen gagasıyla bir yaprak koparıp suya bıraktı. Karınca güçlükle yaprağın üstüne tırmandı. Yaprak yavaş yavaş kıyıya doğru yüzdü. Karınca kurtulmuştu.
+
+Birkaç gün sonra ormana bir avcı geldi. Ağaçtaki güvercini gördü ve ona nişan aldı. Bunu gören karınca hemen avcının ayağını ısırdı. Avcı acıyla sıçradı. Güvercin sesi duydu ve uçup gitti. Karınca, kendisine yardım eden dostuna iyiliğinin karşılığını vermişti. İyilik yapan, iyilik bulur.` },
+
+  { id: 'b3a', grade: 3, title: 'Dedemin Saati', body: `Dedemin çok eski bir cep saati vardı. Saatin kapağı gümüştendi ve üstünde küçük çiçek desenleri vardı. Dedem bu saati her sabah özenle kurar, sonra yeleğinin cebine koyardı. Ben küçükken saatin tık tık sesini dinlemeyi çok severdim.
+
+Bir gün dedeme saati nereden aldığını sordum. Dedem gülümsedi ve anlatmaya başladı. Saat, ona babasından kalmıştı. Babası da onu genç bir öğretmenken almıştı. Yani bu saat, ailemizde yüz yıla yakın bir süredir elden ele dolaşıyordu. Dedem, saatin pek çok bayramı, düğünü ve vedalaşmayı gördüğünü söyledi.
+
+Geçen yaz dedem saati bana verdi. Artık büyüdüğümü, ona iyi bakacağıma inandığını söyledi. Saati ellerimin arasında tutarken kalbim hızlı hızlı çarpıyordu. Şimdi onu her sabah ben kuruyorum. Tık tık sesini dinledikçe dedemi, onun babasını ve ailemin uzun hikâyesini düşünüyorum. Bazı eşyalar sadece eşya değildir. Onlar anıları da içlerinde taşır.` },
+
+  { id: 'b3b', grade: 3, title: 'Göç Eden Kuşlar', body: `Sonbahar gelince gökyüzünde uzun kuş sürüleri görürüz. Bu kuşlar soğuk havalardan kaçarak daha sıcak ülkelere göç eder. Leylekler, kırlangıçlar ve yaban kazları göç eden kuşlardan bazılarıdır.
+
+Kuşlar binlerce kilometre yol giderken yollarını nasıl bulur? Bilim insanları bu soruyu uzun yıllardır araştırıyor. Kuşların güneşe, yıldızlara ve dağ, nehir gibi yer şekillerine bakarak yön bulduğu biliniyor. Bazı kuşların dünyanın manyetik alanını hissedebildiği de düşünülüyor.
+
+Göç, kuşlar için kolay bir yolculuk değildir. Fırtınalar, yorgunluk ve yiyecek bulamamak onları zorlayabilir. Bu yüzden kuşlar yolculuktan önce bol bol beslenir ve güç toplar. Yol boyunca da göllerde, ormanlarda ve sulak alanlarda dinlenirler.
+
+Ülkemiz, göç eden kuşların yolu üzerindedir. Her yıl ilkbahar ve sonbaharda yüz binlerce leylek ülkemizin üzerinden geçer. Kuşların dinlendiği sulak alanları korumak, onların yolculuğunu güvenle tamamlamasına yardım eder.` },
+
+  { id: 'b4a', grade: 4, title: 'Bir Damla Suyun Yolculuğu', body: `Ben küçük bir su damlasıyım. Yolculuğuma yüksek bir dağın tepesinde, bir kar tanesi olarak başladım. Bahar gelip güneş ısıtınca eridim ve diğer damlalarla birlikte küçük bir dereye karıştım. Dere beni şırıl şırıl akıtarak vadiye indirdi.
+
+Vadide başka derelerle birleştik ve büyük bir nehir olduk. Nehrin kıyısındaki köylerde çiftçiler tarlalarını bizimle suluyordu. Bir kısmımız buğday başaklarına, bir kısmımız elma ağaçlarının köklerine ulaştı. Ben ise yoluma devam ettim.
+
+Günlerce aktıktan sonra nehir beni denize ulaştırdı. Denizin tuzlu suyunda balıklarla, deniz yıldızlarıyla tanıştım. Bir sabah güneş öyle güçlü parladı ki ısındım, hafifledim ve buhar olup gökyüzüne yükseldim. Yukarıda milyonlarca damla bir araya gelip kocaman bir bulut oluşturduk.
+
+Rüzgâr bulutumuzu karaya doğru sürükledi. Hava soğuyunca yeniden damlaya dönüştüm ve yağmur olarak toprağa düştüm. Belki bir gün yine bir dağın tepesinde kar olacağım. Benim yolculuğum hiç bitmez. Buna su döngüsü denir. Her damlayı dikkatli kullanmak, bu döngünün hepimize yetmesini sağlar.` },
+
+  { id: 'b4b', grade: 4, title: 'Nasreddin Hoca ve Kazan', body: `Bir gün Nasreddin Hoca, komşusundan büyük bir kazan ödünç istemiş. Komşusu kazanı vermiş. Hoca birkaç gün sonra kazanı geri götürmüş. Ancak kazanın içinde küçük bir tencere de varmış.
+
+Komşusu şaşırmış ve tencerenin ne olduğunu sormuş. Hoca da gülümseyerek, “Senin kazanın doğurdu, bu da onun yavrusu,” demiş. Komşusu bu işe hem şaşırmış hem de sevinmiş. Hiç itiraz etmeden tencereyi de almış.
+
+Aradan birkaç hafta geçmiş. Hoca yine komşusunun kapısını çalmış ve kazanı tekrar istemiş. Komşusu bu sefer kazanı seve seve vermiş. Ne var ki günler geçmiş, haftalar geçmiş, kazan bir türlü geri gelmemiş. Sonunda komşusu dayanamamış ve Hoca'nın evine gitmiş.
+
+“Hocam, kazanımı ne zaman getireceksin?” diye sormuş. Hoca üzgün bir yüzle, “Başın sağ olsun komşu, kazanın öldü,” demiş. Komşusu öfkeyle bağırmış: “Hiç kazan ölür mü Hocam?” Hoca da sakin bir sesle cevap vermiş: “Kazanın doğurduğuna inandın da öldüğüne neden inanmıyorsun?”
+
+Komşusu ne diyeceğini bilememiş. Çünkü işine gelen şeye inanmış, işine gelmeyene ise karşı çıkmıştı. Hoca, ona güzel bir ders vermişti.` },
+
+  { id: 'b5a', grade: 5, title: 'Göbeklitepe', body: `Şanlıurfa yakınlarındaki Göbeklitepe, dünyanın bilinen en eski tapınak alanlarından biri olarak kabul edilir. Yapılan kazılar, buradaki dev taş yapıların yaklaşık on iki bin yıl önce inşa edildiğini gösteriyor. Bu, Mısır piramitlerinden ve Stonehenge'den binlerce yıl daha eski oldukları anlamına gelir.
+
+Göbeklitepe'yi bu kadar özel yapan, yalnızca yaşı değildir. Bilim insanları uzun süre, insanların büyük yapılar inşa edebilmesi için önce yerleşik hayata geçmesi, tarım yapması ve köyler kurması gerektiğini düşünüyordu. Oysa Göbeklitepe'yi yapan insanlar henüz avcılık ve toplayıcılıkla geçiniyordu. Bu keşif, insanlık tarihine dair bildiklerimizi yeniden düşünmemize yol açtı.
+
+Alandaki T biçimli dikilitaşların bazıları beş metreye ulaşan yüksekliktedir ve tonlarca ağırlığındadır. Taşların üzerinde tilki, yaban domuzu, yılan, akrep ve akbaba gibi hayvanların kabartmaları vardır. Bu figürler, o dönemin insanlarının doğayı nasıl gördüğüne dair önemli ipuçları taşır.
+
+Metal aletlerin henüz bilinmediği bir çağda bu taşların nasıl yontulduğu, nasıl taşındığı ve dikildiği hâlâ araştırılıyor. Göbeklitepe, 2018 yılında UNESCO Dünya Mirası Listesi'ne alındı. Bugün dünyanın dört bir yanından gelen ziyaretçiler, insanlığın bu en eski izlerini görmek için Şanlıurfa'ya geliyor. Geçmişi anlamak, geleceğe daha bilinçli bakmamızı sağlar.` },
+
+  { id: 'b5b', grade: 5, title: 'Kütüphanedeki Not', body: `Defne, okulun kütüphanesinde ödevi için kaynak ararken eski bir kitabın arasından katlanmış sarı bir kâğıt düştü. Kâğıdı açtığında özenli bir el yazısıyla yazılmış birkaç satır gördü: “Bu kitabı okuyan kişiye: Merak etmekten asla vazgeçme. Sorduğun her soru, seni yeni bir kapıya götürür.” Notun altında bir tarih vardı. Tam otuz yıl önce yazılmıştı.
+
+Defne çok meraklandı. Bu notu kim yazmıştı? Hemen kütüphaneci Selma Hanım'a gösterdi. Selma Hanım kâğıda uzun uzun baktı, sonra gülümsedi. Notu yazan kişinin, yıllar önce bu okulda okumuş ve şimdi tanınmış bir gök bilimci olan Kerem Bey olduğunu söyledi. Kerem Bey, çocukken bu kütüphanede saatlerce kitap okurmuş.
+
+O akşam Defne, Kerem Bey'e bir mektup yazdı. Notu bulduğunu, kendisinin de yıldızları çok merak ettiğini anlattı. Birkaç hafta sonra okula bir zarf geldi. Kerem Bey mektuba cevap yazmış, üstelik okulu ziyaret edeceğini de bildirmişti.
+
+Ziyaret günü bütün okul spor salonunda toplandı. Kerem Bey gezegenleri ve uzak galaksileri anlattı, öğrencilerin sorularını tek tek cevapladı. Konuşmasının sonunda Defne'ye dönüp şöyle dedi: “O notu yazarken bir gün birinin bulacağını umuyordum. Şimdi sıra sende. Sen de bir sonraki meraklı okura bir not bırak.” Defne o gün, kitabın arasına kendi notunu yerleştirdi.` },
+];
+
+function allTexts() {
+  const custom = DB.getArr('texts').filter(t => t.teacherId === (currentUser && currentUser.id)).map(t => ({ ...t, custom: true }));
+  return BUILTIN_TEXTS.concat(custom);
+}
+
+const isWord = w => /[\p{L}\p{N}]/u.test(w);
+
+function countWords(body) {
+  return body.split(/\s+/).filter(isWord).length;
 }
 
 // ══════════════════════════════════════
@@ -1436,7 +1909,7 @@ function renderDashboard() {
       <div class="stat-card">
         <div class="stat-label">Son Okuma Hızı</div>
         <div class="stat-value">${lastR ? lastR.wpm : '—'}<span class="stat-unit">kelime/dk</span></div>
-        <div class="stat-trend">${lastR ? formatDate(lastR.date) : 'Henüz test yapılmadı'}</div>
+        <div class="stat-trend">${lastR ? formatDate(lastR.date) + ' ' + normPill(lastR.wpm, readingGrade(lastR, s)) : 'Henüz test yapılmadı'}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">İlerleme</div>
@@ -1455,7 +1928,7 @@ function renderDashboard() {
       <div class="card">
         <div class="card-header"><span class="card-title">Okuma Hızı Gelişimi</span></div>
         <div class="card-body">
-          ${readings.length ? buildChart(readings) : '<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">Henüz veri yok</div></div>'}
+          ${readings.length ? buildChart(readings, s) : '<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">Henüz veri yok</div></div>'}
         </div>
       </div>
       <div class="card">
@@ -1515,6 +1988,7 @@ function renderDashboard() {
             <div style="text-align:right;">
               <div style="font-family:var(--font-d);font-size:1.2rem;font-weight:600;color:var(--accent);">${last ? last.wpm : '—'}</div>
               <div style="font-size:11px;color:var(--text3);">k/dk ${trend !== null ? (trend >= 0 ? '▲' + trend : '▼' + Math.abs(trend)) : ''}</div>
+              ${last ? normPill(last.wpm, readingGrade(last, s)) : ''}
             </div>
           </div>`;
         }).join('') || '<div class="empty-state"><div class="empty-state-text">Henüz öğrenci eklenmemiş</div></div>'}
@@ -1539,24 +2013,96 @@ function renderDashboard() {
   `;
 }
 
-function buildChart(readings) {
-  const max = Math.max(...readings.map(r => r.wpm));
-  const bars = readings.slice(-8).map(r => {
-    const h = Math.round((r.wpm / (max + 10)) * 56);
-    return `<div class="chart-bar" style="height:${h}px;" title="${r.wpm} k/dk · ${formatShortDate(r.date)}"></div>`;
-  }).join('');
+// Tarih eksenli okuma hızı grafiği; arkasında o dönemdeki sınıfın hedef aralığı gösterilir
+function buildChart(readings, student) {
+  const pts = readings.slice().sort((a, b) => a.date - b.date);
+  const W = 640, H = 240, L = 40, R = 16, T = 22, B = 30;
 
-  const first = readings[0].wpm;
-  const last = readings[readings.length - 1].wpm;
-  const diff = last - first;
+  let x0 = pts[0].date, x1 = pts[pts.length - 1].date;
+  if (x1 - x0 < 20 * DAY) { x0 -= 10 * DAY; x1 += 10 * DAY; }
 
-  return `<div class="mini-chart">${bars}</div>
-    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-top:6px;">
-      <span>${formatShortDate(readings[0].date)}</span>
-      <span class="${diff >= 0 ? 'trend-up' : 'trend-down'}">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)} kelime/dk ilerleme</span>
-      <span>${formatShortDate(readings[readings.length - 1].date)}</span>
+  const bands = [];
+  if (student) {
+    for (let sy = schoolYear(x0); sy <= schoolYear(x1); sy++) {
+      const g = gradeAt(student, new Date(sy, 9, 1).getTime());
+      if (!NORMS[g]) continue;
+      bands.push({
+        a: Math.max(x0, new Date(sy, 8, 1).getTime()),
+        b: Math.min(x1, new Date(sy + 1, 8, 1).getTime()),
+        lo: NORMS[g][0], hi: NORMS[g][1], g,
+      });
+    }
+  }
+
+  const yTop = Math.max(...pts.map(p => p.wpm), ...bands.map(b => b.hi));
+  const step = yTop <= 90 ? 20 : yTop <= 180 ? 40 : 50;
+  const yMax = Math.ceil(yTop * 1.1 / step) * step;
+  const X = t => L + (t - x0) / (x1 - x0) * (W - L - R);
+  const Y = v => T + (1 - v / yMax) * (H - T - B);
+
+  let svg = '';
+  for (let v = 0; v <= yMax; v += step) {
+    svg += `<line class="lc-grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+    svg += `<text class="lc-axis" x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`;
+  }
+
+  bands.forEach(b => {
+    const bx = X(b.a), bw = X(b.b) - X(b.a);
+    svg += `<rect class="lc-band" x="${bx}" y="${Y(b.hi)}" width="${bw}" height="${Y(b.lo) - Y(b.hi)}" rx="2"/>`;
+    if (bw > 80) svg += `<text class="lc-band-label" x="${bx + 6}" y="${Y(b.hi) - 5}">${b.g}. sınıf hedefi</text>`;
+  });
+
+  const span = x1 - x0;
+  const fmt = span > 300 * DAY
+    ? t => new Date(t).toLocaleDateString('tr-TR', { month: 'short', year: '2-digit' })
+    : t => new Date(t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+  const tickCount = 4;
+  for (let i = 0; i <= tickCount; i++) {
+    const t = x0 + span * i / tickCount;
+    const anchor = i === 0 ? 'start' : i === tickCount ? 'end' : 'middle';
+    svg += `<text class="lc-axis" x="${X(t)}" y="${H - 8}" text-anchor="${anchor}">${fmt(t)}</text>`;
+  }
+
+  if (pts.length > 1) {
+    svg += `<path class="lc-line" d="M${pts.map(p => X(p.date).toFixed(1) + ',' + Y(p.wpm).toFixed(1)).join('L')}"/>`;
+  }
+  pts.forEach(p => {
+    svg += `<circle class="lc-dot" cx="${X(p.date)}" cy="${Y(p.wpm)}" r="4"/>`;
+  });
+
+  // Yalnızca son değeri etiketle
+  const lastP = pts[pts.length - 1];
+  svg += `<text class="lc-value" x="${X(lastP.date) - 8}" y="${Y(lastP.wpm) - 10}" text-anchor="end">${lastP.wpm}</text>`;
+
+  // Fareyle üstüne gelince ayrıntı gösteren geniş, görünmez alanlar
+  pts.forEach(p => {
+    const tip = [formatDate(p.date), p.wpm + ' doğru kelime/dk', accuracyText(p), p.topic].filter(Boolean).join(' · ');
+    svg += `<circle class="lc-hit" cx="${X(p.date)}" cy="${Y(p.wpm)}" r="14" data-tip="${esc(tip)}"/>`;
+  });
+
+  const diff = lastP.wpm - pts[0].wpm;
+  return `<svg class="line-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Okuma hızı gelişimi">${svg}</svg>
+    <div class="chart-legend">
+      <span><i class="lg-line"></i>Doğru kelime/dk</span>
+      ${bands.length ? '<span><i class="lg-band"></i>Sınıf hedef aralığı (yaklaşık)</span>' : ''}
+      ${pts.length > 1 ? `<span class="${diff >= 0 ? 'trend-up' : 'trend-down'}" style="margin-left:auto;">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)} kelime/dk ilerleme</span>` : ''}
     </div>`;
 }
+
+const chartTip = document.createElement('div');
+chartTip.className = 'chart-tip';
+document.body.appendChild(chartTip);
+
+document.addEventListener('mouseover', e => {
+  const h = e.target.closest && e.target.closest('[data-tip]');
+  if (!h) { chartTip.classList.remove('show'); return; }
+  chartTip.textContent = h.dataset.tip;
+  const b = h.getBoundingClientRect();
+  chartTip.style.left = (b.left + b.width / 2) + 'px';
+  chartTip.style.top = (b.top + 6) + 'px';
+  chartTip.classList.add('show');
+});
+document.addEventListener('scroll', () => chartTip.classList.remove('show'), true);
 
 function topicRow(t) {
   return `<div class="topic-item">
@@ -1590,6 +2136,7 @@ function renderStudents() {
         <div class="student-name">${esc(s.name)}</div>
         <div class="student-meta">${esc(s.sinif)}${s.school ? ' · ' + esc(s.school) : ''}</div>
         <div class="student-last">Kod: <strong>${esc(s.id)}</strong>${s.familyEmail ? ' · Aile: ' + esc(s.familyEmail) : ''}</div>
+        ${last ? `<div style="margin-top:6px;">${normPill(last.wpm, readingGrade(last, s))}</div>` : ''}
       </div>
       <div class="wpm-badge">
         <div class="wpm-num">${last ? last.wpm : '—'}</div>
@@ -1599,7 +2146,29 @@ function renderStudents() {
   }).join('')}</div>`;
 }
 
+let editingStudentId = null;
+
 function openAddStudent() {
+  editingStudentId = null;
+  document.getElementById('student-modal-title').textContent = 'Öğrenci Ekle';
+  document.getElementById('student-modal-save').textContent = 'Ekle';
+  document.getElementById('new-student-name').value = '';
+  document.getElementById('new-student-class').value = '4. Sınıf';
+  document.getElementById('new-student-school').value = '';
+  document.getElementById('new-student-family-email').value = '';
+  document.getElementById('modal-add-student').classList.add('open');
+}
+
+function openEditStudent(studentId) {
+  const s = DB.getArr('students').find(st => st.id === studentId);
+  if (!s) return;
+  editingStudentId = studentId;
+  document.getElementById('student-modal-title').textContent = 'Öğrenciyi Düzenle';
+  document.getElementById('student-modal-save').textContent = 'Kaydet';
+  document.getElementById('new-student-name').value = s.name;
+  document.getElementById('new-student-class').value = s.sinif;
+  document.getElementById('new-student-school').value = s.school || '';
+  document.getElementById('new-student-family-email').value = s.familyEmail || '';
   document.getElementById('modal-add-student').classList.add('open');
 }
 
@@ -1612,6 +2181,19 @@ function addStudent() {
   if (!name) { showToast('Öğrenci adı girin', 'error'); return; }
 
   const students = DB.getArr('students');
+
+  if (editingStudentId) {
+    const s = students.find(st => st.id === editingStudentId);
+    if (s) Object.assign(s, { name, sinif, school, familyEmail });
+    DB.set('students', students);
+    closeModal('modal-add-student');
+    showToast('Öğrenci bilgileri güncellendi ✓');
+    openStudentDetail(editingStudentId);
+    refreshCurrentPage();
+    updateSelects();
+    return;
+  }
+
   // Kod yalnızca harf + rakamdan oluşsun ve başka öğrencinin koduyla çakışmasın
   const prefix = initials(name, 3).replace(/[^A-ZÇĞİÖŞÜ]/g, '') || 'OGR';
   let id;
@@ -1653,17 +2235,24 @@ function openStudentDetail(studentId) {
     </div>
 
     <div class="tab-panel active" id="dt-readings">
+      ${!isReadOnly ? `<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+        <button class="btn-sm accent" onclick="openPastReading('${esc(s.id)}')">+ Geçmiş ölçüm gir</button>
+      </div>` : ''}
       ${readings.length ? `
-        <div style="margin-bottom:1rem;">${buildChart(readings)}</div>
+        <div style="margin-bottom:1rem;">${buildChart(readings, s)}</div>
         ${readings.slice().reverse().map(rd => `
-          <div class="session-item">
-            <div class="session-date">${formatShortDate(rd.date)}</div>
+          <div class="session-item reading-row">
+            <div class="session-date">${formatDate(rd.date)}</div>
             <div class="session-wpm">${rd.wpm}</div>
-            <div>
+            <div style="flex:1;min-width:140px;">
               <div class="session-topic">${esc(rd.topic) || '—'}</div>
-              ${rd.note ? `<div class="session-note">${esc(rd.note)}</div>` : ''}
+              <div class="session-note">${[accuracyText(rd), esc(rd.note)].filter(Boolean).join(' · ')}</div>
             </div>
-            ${!isReadOnly ? `<button class="btn-sm danger" onclick="deleteReading('${rd.id}','${studentId}')">Sil</button>` : ''}
+            <div class="row-actions">
+              ${normPill(rd.wpm, readingGrade(rd, s))}
+              ${!isReadOnly ? `<button class="btn-sm" onclick="openEditReading('${rd.id}')">Düzenle</button>
+              <button class="btn-sm danger" onclick="deleteReading('${rd.id}','${esc(studentId)}')">Sil</button>` : ''}
+            </div>
           </div>`).join('')}
       ` : '<div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">Henüz okuma testi yapılmamış</div></div>'}
     </div>
@@ -1687,16 +2276,22 @@ function openStudentDetail(studentId) {
       <div class="session-item"><div class="session-date" style="width:130px">Okul</div><div>${esc(s.school) || '—'}</div></div>
       <div class="session-item"><div class="session-date" style="width:130px">Aile E-posta</div><div>${esc(s.familyEmail) || '—'}</div></div>
       <div class="session-item"><div class="session-date" style="width:130px">Toplam Test</div><div>${readings.length}</div></div>
-      ${!isReadOnly ? `<div style="margin-top:1.5rem;"><button class="btn-sm danger" onclick="deleteStudent('${esc(s.id)}')">Öğrenciyi Sil</button></div>` : ''}
+      ${!isReadOnly ? `<div style="margin-top:1.5rem;display:flex;gap:8px;">
+        <button class="btn-sm" onclick="openEditStudent('${esc(s.id)}')">Bilgileri Düzenle</button>
+        <button class="btn-sm danger" onclick="deleteStudent('${esc(s.id)}')">Öğrenciyi Sil</button>
+      </div>` : ''}
     </div>
   `;
 
+  detailStudentId = studentId;
   document.getElementById('modal-student-detail').classList.add('open');
 }
 
+let detailStudentId = null;
+
 function switchTab(id) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#detail-modal-body .tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#detail-modal-body .tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   event.target.classList.add('active');
 }
@@ -1705,8 +2300,7 @@ function deleteReading(readingId, studentId) {
   if (!confirm('Bu ölçümü silmek istediğinizden emin misiniz?')) return;
   const readings = DB.getArr('readings').filter(r => r.id !== readingId);
   DB.set('readings', readings);
-  openStudentDetail(studentId);
-  renderReadingPage();
+  refreshAfterReadingChange(studentId);
   showToast('Ölçüm silindi');
 }
 
@@ -1762,7 +2356,13 @@ function timerToggle() {
         document.getElementById('timer-start-btn').textContent = 'Yeniden';
         document.getElementById('timer-status-label').textContent = 'Süre doldu!';
         document.getElementById('wpm-entry-section').style.display = 'block';
-        document.getElementById('wpm-count-input').focus();
+        if (currentText()) {
+          setTextMode('last');
+          document.getElementById('result-hint').textContent = 'Metinde öğrencinin son okuduğu kelimeye dokunun.';
+          document.getElementById('reading-text-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          document.getElementById('wpm-count-input').focus();
+        }
       }
     }, 1000);
   } else {
@@ -1783,6 +2383,13 @@ function timerReset() {
   document.getElementById('timer-status-label').textContent = 'Hazır';
   document.getElementById('wpm-entry-section').style.display = 'none';
   document.getElementById('wpm-count-input').value = '';
+  document.getElementById('wpm-error-input').value = '';
+  document.getElementById('result-hint').textContent = 'Okunan kelime ve hata sayısını girin.';
+  errorIdx = new Set();
+  lastIdx = null;
+  paintWords();
+  setTextMode('err');
+  updateResultPreview();
 }
 
 function updateTimerDisplay() {
@@ -1800,25 +2407,35 @@ function updateTimerDisplay() {
 
 function saveWpmResult() {
   const studentId = document.getElementById('timer-student-select').value;
-  const wpm = parseInt(document.getElementById('wpm-count-input').value);
-  const topic = document.getElementById('timer-topic').value.trim();
+  const total = parseInt(document.getElementById('wpm-count-input').value);
+  const errInput = document.getElementById('wpm-error-input').value;
+  const errors = errInput === '' ? null : parseInt(errInput);
   const note = document.getElementById('timer-note').value.trim();
+  const text = currentText();
+  const topic = document.getElementById('timer-topic').value.trim() || (text ? text.title : '');
 
   if (!studentId) { showToast('Öğrenci seçin', 'error'); return; }
-  if (!wpm || wpm < 0) { showToast('Geçerli bir sayı girin', 'error'); return; }
+  if (!total || total < 0) { showToast('Okunan kelime sayısını girin', 'error'); return; }
+  if (errors !== null && (errors < 0 || errors > total)) { showToast('Hata sayısı okunan kelimeden fazla olamaz', 'error'); return; }
 
+  const student = DB.getArr('students').find(s => s.id === studentId);
+  const now = Date.now();
+  const wpm = total - (errors || 0);
   const readings = DB.getArr('readings');
-  readings.push({ id: r(), studentId, wpm, topic, note, date: Date.now(), teacherId: currentUser.id });
+  readings.push({
+    id: r(), studentId, wpm, total, errors, topic, note, date: now,
+    grade: gradeAt(student, now), textId: text ? text.id : null, teacherId: currentUser.id,
+  });
   DB.set('readings', readings);
 
-  showToast(`${wpm} kelime/dk kaydedildi! ✓`);
+  showToast(`${wpm} doğru kelime/dk kaydedildi! ✓`);
   timerReset();
-  document.getElementById('wpm-count-input').value = '';
   renderReadingPage();
 }
 
 function renderReadingPage() {
   updateSelects();
+  renderTextSelect();
   const students = getMyStudents();
   const readings = DB.getArr('readings')
     .filter(r => students.find(s => s.id === r.studentId))
@@ -1838,11 +2455,343 @@ function renderReadingPage() {
       <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;" class="${s ? s.color : 'av-gray'}">${s ? esc(initials(s.name)) : '?'}</div>
       <div style="flex:1;">
         <div style="font-weight:600;font-size:14px;">${s ? esc(s.name) : '?'}</div>
-        <div class="session-note">${esc(rd.topic) || '—'}${rd.note ? ' · ' + esc(rd.note) : ''}</div>
+        <div class="session-note">${[esc(rd.topic) || '—', accuracyText(rd), esc(rd.note)].filter(Boolean).join(' · ')}</div>
       </div>
+      ${normPill(rd.wpm, readingGrade(rd, s))}
       <div class="session-wpm">${rd.wpm}<span style="font-size:11px;font-weight:400;color:var(--text3);font-family:var(--font);"> k/dk</span></div>
     </div>`;
   }).join('');
+}
+
+// Bir ölçüm eklendiğinde/değiştiğinde açık olan ekranları tazele
+function refreshAfterReadingChange(studentId) {
+  if (document.getElementById('modal-student-detail').classList.contains('open') && detailStudentId) {
+    openStudentDetail(detailStudentId);
+  }
+  refreshCurrentPage();
+}
+
+function refreshCurrentPage() {
+  const active = document.querySelector('.page.active');
+  if (active) showPage(active.id.replace('page-', ''));
+}
+
+// ══════════════════════════════════════
+// OKUMA METNİ ÜZERİNDE ÇALIŞMA
+// ══════════════════════════════════════
+let textMode = 'err';      // 'err' = hata işaretle, 'last' = son kelimeyi seç
+let errorIdx = new Set();  // yanlış okunan kelimelerin sırası
+let lastIdx = null;        // son okunan kelimenin sırası
+
+function currentText() {
+  const id = document.getElementById('timer-text-select').value;
+  return id ? allTexts().find(t => t.id === id) : null;
+}
+
+function renderTextSelect() {
+  const sel = document.getElementById('timer-text-select');
+  const prev = sel.value;
+  const texts = allTexts();
+  const groups = [1, 2, 3, 4, 5].map(g => {
+    const ts = texts.filter(t => +t.grade === g);
+    if (!ts.length) return '';
+    return `<optgroup label="${g}. Sınıf">${ts.map(t =>
+      `<option value="${esc(t.id)}">${esc(t.title)}${t.custom ? ' (benim)' : ''} · ${countWords(t.body)} kelime</option>`).join('')}</optgroup>`;
+  }).join('');
+  sel.innerHTML = '<option value="">— Metin kullanmadan (elle gir) —</option>' + groups;
+  sel.value = prev;
+  if (sel.value !== prev) { sel.value = ''; onTextSelect(); }
+}
+
+function onTextSelect() {
+  const t = currentText();
+  const card = document.getElementById('reading-text-card');
+  errorIdx = new Set();
+  lastIdx = null;
+  if (!t) {
+    card.hidden = true;
+    document.getElementById('reading-text').innerHTML = '';
+    return;
+  }
+  card.hidden = false;
+  document.getElementById('reading-text-title').textContent = `${t.title} · ${t.grade}. sınıf · ${countWords(t.body)} kelime`;
+  let i = 0;
+  document.getElementById('reading-text').innerHTML = t.body.trim().split(/\n\s*\n/).map(p =>
+    '<p>' + p.trim().split(/\s+/).map(w => isWord(w) ? `<span class="w" data-i="${i++}">${esc(w)}</span>` : esc(w)).join(' ') + '</p>'
+  ).join('');
+  document.getElementById('delete-text-btn').hidden = !t.custom;
+  setTextMode(timerDone ? 'last' : 'err');
+}
+
+function setTextMode(mode) {
+  textMode = mode;
+  document.getElementById('mode-err').classList.toggle('active', mode === 'err');
+  document.getElementById('mode-last').classList.toggle('active', mode === 'last');
+  document.getElementById('reading-help').textContent = mode === 'err'
+    ? 'Öğrenci okurken yanlış okuduğu kelimelere dokunun. Yanlışlıkla işaretlediğinize tekrar dokunursanız işaret kalkar.'
+    : 'Öğrencinin son okuduğu kelimeye dokunun. Okunan kelime ve hata sayısı otomatik hesaplanır. Öğrenci metni süre dolmadan bitirirse önce süreyi durdurun, sonra son kelimeye dokunun.';
+}
+
+document.getElementById('reading-text').addEventListener('click', e => {
+  const w = e.target.closest('.w');
+  if (!w) return;
+  const i = +w.dataset.i;
+  if (textMode === 'err') {
+    errorIdx.has(i) ? errorIdx.delete(i) : errorIdx.add(i);
+  } else {
+    lastIdx = lastIdx === i ? null : i;
+  }
+  paintWords();
+  if (lastIdx !== null) {
+    let words = lastIdx + 1;
+    let errs = [...errorIdx].filter(x => x <= lastIdx).length;
+    let hint = 'Metinden hesaplandı. Gerekirse düzeltebilirsiniz.';
+    // Öğrenci metni süre dolmadan bitirdiyse sonucu 1 dakikaya oranla
+    const elapsed = 60 - timerSeconds;
+    if (!timerDone && elapsed >= 10) {
+      words = Math.round(words * 60 / elapsed);
+      errs = Math.round(errs * 60 / elapsed);
+      hint = `Okuma ${elapsed} saniye sürdü; sonuç 1 dakikaya göre hesaplandı.`;
+    }
+    document.getElementById('wpm-count-input').value = words;
+    document.getElementById('wpm-error-input').value = errs;
+    document.getElementById('wpm-entry-section').style.display = 'block';
+    document.getElementById('result-hint').textContent = hint;
+  }
+  updateResultPreview();
+});
+
+function paintWords() {
+  document.querySelectorAll('#reading-text .w').forEach(el => {
+    const i = +el.dataset.i;
+    el.classList.toggle('err', errorIdx.has(i));
+    el.classList.toggle('last', i === lastIdx);
+    el.classList.toggle('after', lastIdx !== null && i > lastIdx);
+  });
+}
+
+function updateResultPreview() {
+  const box = document.getElementById('result-preview');
+  const total = parseInt(document.getElementById('wpm-count-input').value);
+  const errors = parseInt(document.getElementById('wpm-error-input').value) || 0;
+  if (!total || total < 0) { box.innerHTML = ''; return; }
+  const correct = Math.max(total - errors, 0);
+  const student = DB.getArr('students').find(s => s.id === document.getElementById('timer-student-select').value);
+  box.innerHTML = `<span><b>${correct}</b> doğru kelime/dk</span>
+    <span>%${Math.round(correct / total * 100)} doğruluk</span>
+    ${normPill(correct, gradeAt(student, Date.now()))}`;
+}
+
+// ── Kendi metnini ekleme ──
+function openAddText() {
+  document.getElementById('text-title-input').value = '';
+  document.getElementById('text-body-input').value = '';
+  document.getElementById('modal-add-text').classList.add('open');
+}
+
+function addText() {
+  const title = document.getElementById('text-title-input').value.trim();
+  const grade = +document.getElementById('text-grade-input').value;
+  const body = document.getElementById('text-body-input').value.trim();
+  if (!title || !body) { showToast('Metnin adını ve kendisini girin', 'error'); return; }
+  if (countWords(body) < 20) { showToast('Metin çok kısa (en az 20 kelime)', 'error'); return; }
+
+  const texts = DB.getArr('texts');
+  const id = 'c' + r();
+  texts.push({ id, title, grade, body, teacherId: currentUser.id });
+  DB.set('texts', texts);
+  closeModal('modal-add-text');
+  renderTextSelect();
+  document.getElementById('timer-text-select').value = id;
+  onTextSelect();
+  showToast('Metin eklendi ✓');
+}
+
+function deleteCustomText() {
+  const t = currentText();
+  if (!t || !t.custom) return;
+  if (!confirm(`"${t.title}" metnini silmek istediğinizden emin misiniz?`)) return;
+  DB.set('texts', DB.getArr('texts').filter(x => x.id !== t.id));
+  document.getElementById('timer-text-select').value = '';
+  renderTextSelect();
+  onTextSelect();
+  showToast('Metin silindi');
+}
+
+// ══════════════════════════════════════
+// GEÇMİŞ ÖLÇÜM GİRİŞİ
+// ══════════════════════════════════════
+let editingReadingId = null;
+let pastTab = 'single';
+
+const pad2 = n => String(n).padStart(2, '0');
+const toDateInput = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+// Saat dilimi kaymasın diye günün ortası
+const fromDateInput = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d, 12).getTime(); };
+
+function fillPastStudentSelect(studentId) {
+  const sel = document.getElementById('past-student-select');
+  sel.innerHTML = '<option value="">— Seçin —</option>' + getMyStudents().map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.sinif)})</option>`).join('');
+  sel.value = studentId || '';
+}
+
+function switchPastTab(tab) {
+  pastTab = tab;
+  document.getElementById('past-tab-single').classList.toggle('active', tab === 'single');
+  document.getElementById('past-tab-bulk').classList.toggle('active', tab === 'bulk');
+  document.getElementById('past-single').hidden = tab !== 'single';
+  document.getElementById('past-bulk').hidden = tab !== 'bulk';
+  document.getElementById('past-save-btn').textContent = editingReadingId ? 'Kaydet' : tab === 'bulk' ? 'Hepsini Ekle' : 'Ekle';
+  if (tab === 'bulk') renderBulkPreview();
+}
+
+function openPastReading(studentId) {
+  editingReadingId = null;
+  document.getElementById('past-modal-title').textContent = 'Geçmiş Ölçüm Gir';
+  document.getElementById('past-tabs').hidden = false;
+  fillPastStudentSelect(studentId);
+  const dateEl = document.getElementById('past-date');
+  dateEl.max = toDateInput(Date.now());
+  dateEl.value = '';
+  ['past-total', 'past-errors', 'past-topic', 'past-note', 'past-bulk-input'].forEach(id => document.getElementById(id).value = '');
+  switchPastTab('single');
+  document.getElementById('modal-past-reading').classList.add('open');
+}
+
+function openEditReading(readingId) {
+  const rd = DB.getArr('readings').find(x => x.id === readingId);
+  if (!rd) return;
+  editingReadingId = readingId;
+  document.getElementById('past-modal-title').textContent = 'Ölçümü Düzenle';
+  document.getElementById('past-tabs').hidden = true;
+  fillPastStudentSelect(rd.studentId);
+  const dateEl = document.getElementById('past-date');
+  dateEl.max = toDateInput(Date.now());
+  dateEl.value = toDateInput(rd.date);
+  document.getElementById('past-total').value = rd.total ?? rd.wpm;
+  document.getElementById('past-errors').value = rd.errors ?? '';
+  document.getElementById('past-topic').value = rd.topic || '';
+  document.getElementById('past-note').value = rd.note || '';
+  switchPastTab('single');
+  document.getElementById('modal-past-reading').classList.add('open');
+}
+
+const TR_MONTHS = ['oca', 'şub', 'mar', 'nis', 'may', 'haz', 'tem', 'ağu', 'eyl', 'eki', 'kas', 'ara'];
+
+// Telefon notundaki bir satırı okur: tarih + kelime sayısı (+ isteğe bağlı hata ve not)
+function parseBulkLine(line) {
+  const s = line.trim();
+  if (!s) return null;
+
+  let m, y, mo, d;
+  const lower = s.toLocaleLowerCase('tr');
+  if ((m = s.match(/(\d{4})[.\/-](\d{1,2})[.\/-](\d{1,2})/))) {
+    [y, mo, d] = [+m[1], +m[2], +m[3]];
+  } else if ((m = s.match(/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})/))) {
+    [d, mo, y] = [+m[1], +m[2], +m[3]];
+    if (y < 100) y += 2000;
+  } else if ((m = lower.match(/(\d{1,2})\s+(oca|şub|mar|nis|may|haz|tem|ağu|eyl|eki|kas|ara)[a-zçğıöşü]*\.?\s+(\d{4})/))) {
+    [d, mo, y] = [+m[1], TR_MONTHS.indexOf(m[2]) + 1, +m[3]];
+  } else {
+    return { line: s, error: 'Tarih bulunamadı' };
+  }
+
+  const dateObj = new Date(y, mo - 1, d, 12);
+  if (dateObj.getMonth() !== mo - 1 || dateObj.getDate() !== d) return { line: s, error: 'Geçersiz tarih' };
+  if (dateObj.getTime() > Date.now()) return { line: s, error: 'Tarih ileri bir gün' };
+
+  let rest = s.slice(0, m.index) + ' ' + s.slice(m.index + m[0].length);
+
+  let errors = null;
+  const em = rest.match(/(\d+)\s*(hata|yanlış|yanlis)/i);
+  if (em) { errors = +em[1]; rest = rest.replace(em[0], ' '); }
+
+  const wm = rest.match(/\d+/);
+  if (!wm) return { line: s, error: 'Kelime sayısı bulunamadı' };
+  const total = +wm[0];
+  rest = rest.replace(wm[0], ' ');
+  if (!total || total > 400) return { line: s, error: 'Kelime sayısı geçersiz' };
+  if (errors !== null && errors > total) return { line: s, error: 'Hata sayısı kelime sayısından fazla' };
+
+  const note = rest.split(/[\s,;|\/]+/)
+    .filter(t => t && !/^[-–—.:]+$/.test(t) && !/^(kelime|kel|k|dk|dakika|wpm)$/i.test(t))
+    .join(' ');
+
+  return { line: s, date: dateObj.getTime(), total, errors, note };
+}
+
+function parseBulk(text) {
+  return text.split(/\r?\n/).map(parseBulkLine).filter(Boolean);
+}
+
+function renderBulkPreview() {
+  const rows = parseBulk(document.getElementById('past-bulk-input').value);
+  const box = document.getElementById('past-bulk-preview');
+  if (!rows.length) { box.innerHTML = ''; return; }
+  const ok = rows.filter(x => !x.error);
+  const bad = rows.length - ok.length;
+  box.innerHTML = `<div class="bulk-summary"><strong>${ok.length}</strong> ölçüm eklenecek${bad ? ` · <span style="color:var(--danger)">${bad} satır anlaşılamadı, atlanacak</span>` : ''}</div>
+    ${rows.map(x => x.error
+      ? `<div class="bulk-row bad"><span>⚠ ${esc(x.error)}</span><span>${esc(x.line)}</span></div>`
+      : `<div class="bulk-row"><span>${formatDate(x.date)}</span><span><strong>${x.total}</strong> kelime${x.errors !== null ? ' · ' + x.errors + ' hata' : ''}${x.note ? ' · ' + esc(x.note) : ''}</span></div>`
+    ).join('')}`;
+}
+
+function makeReading(student, x) {
+  return {
+    id: r(), studentId: student.id, wpm: x.total - (x.errors || 0), total: x.total, errors: x.errors,
+    topic: x.topic || '', note: x.note || '', date: x.date, grade: gradeAt(student, x.date),
+    textId: null, teacherId: currentUser.id,
+  };
+}
+
+function savePastReading() {
+  const studentId = document.getElementById('past-student-select').value;
+  if (!studentId) { showToast('Öğrenci seçin', 'error'); return; }
+  const student = DB.getArr('students').find(s => s.id === studentId);
+  const readings = DB.getArr('readings');
+
+  if (pastTab === 'bulk' && !editingReadingId) {
+    const rows = parseBulk(document.getElementById('past-bulk-input').value).filter(x => !x.error);
+    if (!rows.length) { showToast('Eklenecek geçerli satır yok', 'error'); return; }
+    rows.forEach(x => readings.push(makeReading(student, x)));
+    DB.set('readings', readings);
+    closeModal('modal-past-reading');
+    showToast(`${rows.length} geçmiş ölçüm eklendi ✓`);
+    refreshAfterReadingChange(studentId);
+    return;
+  }
+
+  const dateStr = document.getElementById('past-date').value;
+  const total = parseInt(document.getElementById('past-total').value);
+  const errStr = document.getElementById('past-errors').value;
+  const errors = errStr === '' ? null : parseInt(errStr);
+  if (!dateStr) { showToast('Tarih seçin', 'error'); return; }
+  const date = fromDateInput(dateStr);
+  if (date > Date.now() + DAY) { showToast('Tarih ileri bir gün olamaz', 'error'); return; }
+  if (!total || total < 1 || total > 400) { showToast('Okunan kelime sayısını girin', 'error'); return; }
+  if (errors !== null && (errors < 0 || errors > total)) { showToast('Hata sayısı kelime sayısından fazla olamaz', 'error'); return; }
+
+  const x = {
+    date, total, errors,
+    topic: document.getElementById('past-topic').value.trim(),
+    note: document.getElementById('past-note').value.trim(),
+  };
+
+  if (editingReadingId) {
+    const rd = readings.find(z => z.id === editingReadingId);
+    if (rd) {
+      const fresh = makeReading(student, x);
+      Object.assign(rd, { ...fresh, id: rd.id, textId: rd.textId || null });
+    }
+    showToast('Ölçüm güncellendi ✓');
+  } else {
+    readings.push(makeReading(student, x));
+    showToast('Geçmiş ölçüm eklendi ✓');
+  }
+  DB.set('readings', readings);
+  closeModal('modal-past-reading');
+  refreshAfterReadingChange(studentId);
 }
 
 // ══════════════════════════════════════
