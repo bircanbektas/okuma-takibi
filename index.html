@@ -1222,6 +1222,16 @@ function seedDemo() {
 
 function r() { return Math.random().toString(36).substr(2, 9); }
 
+// Kullanıcı girdisini HTML'e güvenle yazmak için
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// "Ali  Veli" gibi fazla boşluklu isimlerde de çalışır
+function initials(name, n = 2) {
+  return String(name || '').split(/\s+/).filter(Boolean).map(w => w[0]).join('').substr(0, n).toUpperCase();
+}
+
 // ══════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════
@@ -1282,10 +1292,11 @@ function doRegister() {
 
 function loginSuccess(user) {
   currentUser = user;
+  DB.set('session', user.id);
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   document.getElementById('user-name-display').textContent = user.name;
-  document.getElementById('user-avatar').textContent = user.name.split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
+  document.getElementById('user-avatar').textContent = initials(user.name);
   const badge = document.getElementById('user-role-badge');
   if (user.role === 'aile') {
     badge.textContent = 'Aile';
@@ -1293,6 +1304,7 @@ function loginSuccess(user) {
     setupFamilyView();
   } else {
     badge.textContent = 'Öğretmen';
+    badge.classList.remove('aile');
     setupTeacherView();
   }
   showPage('dashboard');
@@ -1300,6 +1312,8 @@ function loginSuccess(user) {
 
 function doLogout() {
   currentUser = null;
+  localStorage.removeItem('oku_session');
+  document.getElementById('login-password').value = '';
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
 }
@@ -1311,6 +1325,9 @@ function setupTeacherView() {
     <button class="nav-btn" onclick="showPage('okuma')" id="nav-okuma">Okuma Testi</button>
     <button class="nav-btn" onclick="showPage('konular')" id="nav-konular">Konu Takibi</button>
   `;
+  // Önceden aile hesabıyla girildiyse gizlenmiş olabilirler
+  document.getElementById('add-student-btn').style.display = '';
+  document.getElementById('add-topic-btn').style.display = '';
 }
 
 function setupFamilyView() {
@@ -1396,13 +1413,19 @@ function renderDashboard() {
   const allTopics = DB.getArr('topics').filter(t => students.find(s => s.id === t.studentId));
 
   const statsGrid = document.getElementById('stats-grid');
+  document.querySelectorAll('#page-dashboard .family-notice').forEach(n => n.remove());
 
   if (currentUser.role === 'aile') {
     const s = students[0];
-    if (!s) { statsGrid.innerHTML = '<p style="color:var(--text2)">Bağlı öğrenci bulunamadı.</p>'; return; }
+    if (!s) {
+      statsGrid.innerHTML = '<p style="color:var(--text2)">Bağlı öğrenci bulunamadı.</p>';
+      document.getElementById('dashboard-content').innerHTML = '';
+      return;
+    }
     const readings = getStudentReadings(s.id);
     const lastR = readings[readings.length - 1];
     const firstR = readings[0];
+    const diff = readings.length > 1 ? lastR.wpm - firstR.wpm : null;
     const topics = getStudentTopics(s.id);
     const doneTp = topics.filter(t => t.done).length;
 
@@ -1417,8 +1440,8 @@ function renderDashboard() {
       </div>
       <div class="stat-card">
         <div class="stat-label">İlerleme</div>
-        <div class="stat-value">${readings.length > 1 ? '+' + (lastR.wpm - firstR.wpm) : '—'}<span class="stat-unit">${readings.length > 1 ? 'kelime' : ''}</span></div>
-        <div class="stat-trend trend-up">${readings.length > 1 ? 'İlk ölçümden bu yana' : 'Daha fazla ölçüm gerekli'}</div>
+        <div class="stat-value">${diff === null ? '—' : (diff > 0 ? '+' : '') + diff}<span class="stat-unit">${diff === null ? '' : 'kelime'}</span></div>
+        <div class="stat-trend ${diff === null ? '' : diff >= 0 ? 'trend-up' : 'trend-down'}">${diff === null ? 'Daha fazla ölçüm gerekli' : 'İlk ölçümden bu yana'}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">İşlenen Konular</div>
@@ -1483,11 +1506,11 @@ function renderDashboard() {
           const last = readings[readings.length - 1];
           const prev = readings[readings.length - 2];
           const trend = last && prev ? last.wpm - prev.wpm : null;
-          return `<div class="session-item" style="cursor:pointer;" onclick="openStudentDetail('${s.id}')">
-            <div class="student-avatar ${s.color}" style="width:38px;height:38px;font-size:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${s.name.split(' ').map(w=>w[0]).join('').substr(0,2)}</div>
+          return `<div class="session-item" style="cursor:pointer;" onclick="openStudentDetail('${esc(s.id)}')">
+            <div class="student-avatar ${s.color}" style="width:38px;height:38px;font-size:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${esc(initials(s.name))}</div>
             <div style="flex:1;">
-              <div style="font-weight:600;font-size:14px;">${s.name}</div>
-              <div style="font-size:12px;color:var(--text3);">${s.sinif}</div>
+              <div style="font-weight:600;font-size:14px;">${esc(s.name)}</div>
+              <div style="font-size:12px;color:var(--text3);">${esc(s.sinif)}</div>
             </div>
             <div style="text-align:right;">
               <div style="font-family:var(--font-d);font-size:1.2rem;font-weight:600;color:var(--accent);">${last ? last.wpm : '—'}</div>
@@ -1505,10 +1528,10 @@ function renderDashboard() {
           return `<div class="topic-item">
             <div class="topic-check ${t.done ? 'done' : ''}">${t.done ? '✓' : ''}</div>
             <div style="flex:1;">
-              <div class="topic-name ${t.done ? 'done' : ''}" style="font-size:14px;">${t.name}</div>
-              <div style="font-size:12px;color:var(--text3);">${s ? s.name : ''}</div>
+              <div class="topic-name ${t.done ? 'done' : ''}" style="font-size:14px;">${esc(t.name)}</div>
+              <div style="font-size:12px;color:var(--text3);">${s ? esc(s.name) : ''}</div>
             </div>
-            <span class="topic-lesson">${t.lesson}</span>
+            <span class="topic-lesson">${esc(t.lesson)}</span>
           </div>`;
         }).join('') || '<div class="empty-state"><div class="empty-state-text">Henüz konu eklenmemiş</div></div>'}
       </div>
@@ -1539,10 +1562,10 @@ function topicRow(t) {
   return `<div class="topic-item">
     <div class="topic-check ${t.done ? 'done' : ''}">${t.done ? '✓' : ''}</div>
     <div style="flex:1;">
-      <div class="topic-name ${t.done ? 'done' : ''}">${t.name}</div>
-      ${t.note ? `<div style="font-size:12px;color:var(--text3);">${t.note}</div>` : ''}
+      <div class="topic-name ${t.done ? 'done' : ''}">${esc(t.name)}</div>
+      ${t.note ? `<div style="font-size:12px;color:var(--text3);">${esc(t.note)}</div>` : ''}
     </div>
-    <span class="topic-lesson">${t.lesson}</span>
+    <span class="topic-lesson">${esc(t.lesson)}</span>
   </div>`;
 }
 
@@ -1561,12 +1584,12 @@ function renderStudents() {
   list.innerHTML = `<div class="grid-2">${students.map(s => {
     const readings = getStudentReadings(s.id);
     const last = readings[readings.length - 1];
-    return `<div class="student-card" onclick="openStudentDetail('${s.id}')">
-      <div class="student-avatar ${s.color}">${s.name.split(' ').map(w=>w[0]).join('').substr(0,2)}</div>
+    return `<div class="student-card" onclick="openStudentDetail('${esc(s.id)}')">
+      <div class="student-avatar ${s.color}">${esc(initials(s.name))}</div>
       <div class="student-info">
-        <div class="student-name">${s.name}</div>
-        <div class="student-meta">${s.sinif}${s.school ? ' · ' + s.school : ''}</div>
-        <div class="student-last">Kod: <strong>${s.id}</strong>${s.familyEmail ? ' · Aile: ' + s.familyEmail : ''}</div>
+        <div class="student-name">${esc(s.name)}</div>
+        <div class="student-meta">${esc(s.sinif)}${s.school ? ' · ' + esc(s.school) : ''}</div>
+        <div class="student-last">Kod: <strong>${esc(s.id)}</strong>${s.familyEmail ? ' · Aile: ' + esc(s.familyEmail) : ''}</div>
       </div>
       <div class="wpm-badge">
         <div class="wpm-num">${last ? last.wpm : '—'}</div>
@@ -1588,11 +1611,13 @@ function addStudent() {
 
   if (!name) { showToast('Öğrenci adı girin', 'error'); return; }
 
-  const initials = name.split(' ').map(w => w[0].toUpperCase()).join('').substr(0, 3);
-  const id = initials + Math.floor(Math.random() * 900 + 100);
+  const students = DB.getArr('students');
+  // Kod yalnızca harf + rakamdan oluşsun ve başka öğrencinin koduyla çakışmasın
+  const prefix = initials(name, 3).replace(/[^A-ZÇĞİÖŞÜ]/g, '') || 'OGR';
+  let id;
+  do { id = prefix + Math.floor(Math.random() * 900 + 100); } while (students.some(s => s.id === id));
   const color = COLORS[Math.floor(Math.random() * COLORS.length)];
 
-  const students = DB.getArr('students');
   students.push({ id, name, sinif, school, familyEmail, color, teacherId: currentUser.id });
   DB.set('students', students);
 
@@ -1635,8 +1660,8 @@ function openStudentDetail(studentId) {
             <div class="session-date">${formatShortDate(rd.date)}</div>
             <div class="session-wpm">${rd.wpm}</div>
             <div>
-              <div class="session-topic">${rd.topic || '—'}</div>
-              ${rd.note ? `<div class="session-note">${rd.note}</div>` : ''}
+              <div class="session-topic">${esc(rd.topic) || '—'}</div>
+              ${rd.note ? `<div class="session-note">${esc(rd.note)}</div>` : ''}
             </div>
             ${!isReadOnly ? `<button class="btn-sm danger" onclick="deleteReading('${rd.id}','${studentId}')">Sil</button>` : ''}
           </div>`).join('')}
@@ -1647,22 +1672,22 @@ function openStudentDetail(studentId) {
       ${topics.map(t => `<div class="topic-item">
         <div class="topic-check ${t.done ? 'done' : ''}" ${!isReadOnly ? `onclick="toggleTopic('${t.id}','${studentId}')"` : ''} style="${!isReadOnly ? 'cursor:pointer' : ''}">${t.done ? '✓' : ''}</div>
         <div style="flex:1;">
-          <div class="topic-name ${t.done ? 'done' : ''}">${t.name}</div>
-          ${t.note ? `<div style="font-size:12px;color:var(--text3);">${t.note}</div>` : ''}
+          <div class="topic-name ${t.done ? 'done' : ''}">${esc(t.name)}</div>
+          ${t.note ? `<div style="font-size:12px;color:var(--text3);">${esc(t.note)}</div>` : ''}
           <div style="font-size:11px;color:var(--text3);">${formatDate(t.date)}</div>
         </div>
-        <span class="topic-lesson">${t.lesson}</span>
+        <span class="topic-lesson">${esc(t.lesson)}</span>
         ${!isReadOnly ? `<button class="btn-sm danger" onclick="deleteTopic('${t.id}','${studentId}')">Sil</button>` : ''}
       </div>`).join('') || '<div class="empty-state"><div class="empty-state-text">Henüz konu eklenmemiş</div></div>'}
     </div>
 
     <div class="tab-panel" id="dt-info">
-      <div class="session-item"><div class="session-date" style="width:130px">Öğrenci Kodu</div><div><strong>${s.id}</strong></div></div>
-      <div class="session-item"><div class="session-date" style="width:130px">Sınıf</div><div>${s.sinif}</div></div>
-      <div class="session-item"><div class="session-date" style="width:130px">Okul</div><div>${s.school || '—'}</div></div>
-      <div class="session-item"><div class="session-date" style="width:130px">Aile E-posta</div><div>${s.familyEmail || '—'}</div></div>
+      <div class="session-item"><div class="session-date" style="width:130px">Öğrenci Kodu</div><div><strong>${esc(s.id)}</strong></div></div>
+      <div class="session-item"><div class="session-date" style="width:130px">Sınıf</div><div>${esc(s.sinif)}</div></div>
+      <div class="session-item"><div class="session-date" style="width:130px">Okul</div><div>${esc(s.school) || '—'}</div></div>
+      <div class="session-item"><div class="session-date" style="width:130px">Aile E-posta</div><div>${esc(s.familyEmail) || '—'}</div></div>
       <div class="session-item"><div class="session-date" style="width:130px">Toplam Test</div><div>${readings.length}</div></div>
-      ${!isReadOnly ? `<div style="margin-top:1.5rem;"><button class="btn-sm danger" onclick="deleteStudent('${s.id}')">Öğrenciyi Sil</button></div>` : ''}
+      ${!isReadOnly ? `<div style="margin-top:1.5rem;"><button class="btn-sm danger" onclick="deleteStudent('${esc(s.id)}')">Öğrenciyi Sil</button></div>` : ''}
     </div>
   `;
 
@@ -1810,10 +1835,10 @@ function renderReadingPage() {
     const s = students.find(st => st.id === rd.studentId);
     return `<div class="session-item">
       <div class="session-date">${formatShortDate(rd.date)}</div>
-      <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;" class="${s ? s.color : 'av-gray'}">${s ? s.name.split(' ').map(w=>w[0]).join('').substr(0,2) : '?'}</div>
+      <div style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;" class="${s ? s.color : 'av-gray'}">${s ? esc(initials(s.name)) : '?'}</div>
       <div style="flex:1;">
-        <div style="font-weight:600;font-size:14px;">${s ? s.name : '?'}</div>
-        <div class="session-note">${rd.topic || '—'}${rd.note ? ' · ' + rd.note : ''}</div>
+        <div style="font-weight:600;font-size:14px;">${s ? esc(s.name) : '?'}</div>
+        <div class="session-note">${esc(rd.topic) || '—'}${rd.note ? ' · ' + esc(rd.note) : ''}</div>
       </div>
       <div class="session-wpm">${rd.wpm}<span style="font-size:11px;font-weight:400;color:var(--text3);font-family:var(--font);"> k/dk</span></div>
     </div>`;
@@ -1857,7 +1882,7 @@ function renderTopics() {
   // Populate filter selects
   const sf = document.getElementById('topic-student-filter');
   const currentSF = sf.value;
-  sf.innerHTML = '<option value="">Tüm öğrenciler</option>' + students.map(s => `<option value="${s.id}" ${s.id === currentSF ? 'selected' : ''}>${s.name}</option>`).join('');
+  sf.innerHTML = '<option value="">Tüm öğrenciler</option>' + students.map(s => `<option value="${esc(s.id)}" ${s.id === currentSF ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
 
   let topics = DB.getArr('topics').filter(t => students.find(s => s.id === t.studentId));
   if (studentFilter) topics = topics.filter(t => t.studentId === studentFilter);
@@ -1875,14 +1900,14 @@ function renderTopics() {
     return `<div class="topic-item">
       <div class="topic-check ${t.done ? 'done' : ''}" ${!isReadOnly ? `onclick="toggleTopicDirect('${t.id}')"` : ''} style="${!isReadOnly ? 'cursor:pointer;' : ''}">${t.done ? '✓' : ''}</div>
       <div style="flex:1;">
-        <div class="topic-name ${t.done ? 'done' : ''}">${t.name}</div>
+        <div class="topic-name ${t.done ? 'done' : ''}">${esc(t.name)}</div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap;">
-          ${s ? `<span style="font-size:12px;color:var(--text3);">${s.name}</span>` : ''}
-          ${t.note ? `<span style="font-size:12px;color:var(--text3);">· ${t.note}</span>` : ''}
+          ${s ? `<span style="font-size:12px;color:var(--text3);">${esc(s.name)}</span>` : ''}
+          ${t.note ? `<span style="font-size:12px;color:var(--text3);">· ${esc(t.note)}</span>` : ''}
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:2px;">${formatDate(t.date)}</div>
       </div>
-      <span class="topic-lesson">${t.lesson}</span>
+      <span class="topic-lesson">${esc(t.lesson)}</span>
       ${!isReadOnly ? `<button class="btn-sm danger" onclick="deleteTopic('${t.id}', null)">Sil</button>` : ''}
     </div>`;
   }).join('');
@@ -1909,7 +1934,7 @@ const _deleteTopic = deleteTopic;
 // ══════════════════════════════════════
 function updateSelects() {
   const students = getMyStudents();
-  const opts = '<option value="">— Seçin —</option>' + students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  const opts = '<option value="">— Seçin —</option>' + students.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
   ['timer-student-select', 'topic-student-select'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { const v = el.value; el.innerHTML = opts; el.value = v; }
@@ -1918,7 +1943,7 @@ function updateSelects() {
   const tsf = document.getElementById('topic-student-filter');
   if (tsf) {
     const v = tsf.value;
-    tsf.innerHTML = '<option value="">Tüm öğrenciler</option>' + students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    tsf.innerHTML = '<option value="">Tüm öğrenciler</option>' + students.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
     tsf.value = v;
   }
 }
@@ -1938,6 +1963,11 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 // INIT
 // ══════════════════════════════════════
 seedDemo();
+
+// Sayfa yenilendiğinde oturumu koru
+const savedSession = DB.get('session');
+const savedUser = savedSession && DB.getArr('users').find(u => u.id === savedSession);
+if (savedUser) loginSuccess(savedUser);
 
 // Keyboard shortcut: Enter on login
 document.addEventListener('keydown', e => {
