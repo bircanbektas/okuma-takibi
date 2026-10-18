@@ -1,0 +1,63 @@
+rules_version = '2';
+
+// OkuTakip güvenlik kuralları
+// - Öğretmen yalnızca kendi oluşturduğu öğrenci, ölçüm, konu ve metinleri görür/değiştirir.
+// - Aile, e-posta adresini doğruladıktan sonra yalnızca o adresin yazılı olduğu
+//   öğrenci kayıtlarını ve bunların ölçüm/konularını GÖRÜR; hiçbir şeyi değiştiremez.
+// Firebase Console → Firestore Database → Kurallar (Rules) sekmesine yapıştırılıp yayınlanır.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsExisting() {
+      return signedIn() && resource.data.teacherId == request.auth.uid;
+    }
+
+    function ownsIncoming() {
+      return signedIn() && request.resource.data.teacherId == request.auth.uid;
+    }
+
+    function isVerifiedFamily() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && resource.data.familyEmail is string
+        && resource.data.familyEmail != ''
+        && resource.data.familyEmail == request.auth.token.email.lower();
+    }
+
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /students/{id} {
+      allow read: if ownsExisting() || isVerifiedFamily();
+      allow create: if ownsIncoming();
+      allow update: if ownsExisting() && ownsIncoming();
+      allow delete: if ownsExisting();
+    }
+
+    match /readings/{id} {
+      allow read: if ownsExisting() || isVerifiedFamily();
+      allow create: if ownsIncoming();
+      allow update: if ownsExisting() && ownsIncoming();
+      allow delete: if ownsExisting();
+    }
+
+    match /topics/{id} {
+      allow read: if ownsExisting() || isVerifiedFamily();
+      allow create: if ownsIncoming();
+      allow update: if ownsExisting() && ownsIncoming();
+      allow delete: if ownsExisting();
+    }
+
+    match /texts/{id} {
+      allow read, delete: if ownsExisting();
+      allow create: if ownsIncoming();
+      allow update: if ownsExisting() && ownsIncoming();
+    }
+  }
+}

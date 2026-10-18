@@ -857,6 +857,32 @@
 
   [hidden] { display: none !important; }
 
+  #loading-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: var(--bg);
+  }
+
+  .loading-text { color: var(--text2); font-size: 14px; }
+
+  .verify-card {
+    background: var(--warm-bg);
+    border: 1px solid rgba(184,115,51,0.25);
+    border-radius: var(--r);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: #6B4423;
+    font-size: 14px;
+  }
+
+  .verify-card .header-actions { margin-top: 0.75rem; }
+
+  .child-switch { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+
   .card-header { flex-wrap: wrap; gap: 8px; }
 
   .page-header.with-action {
@@ -1058,8 +1084,14 @@
 </head>
 <body>
 
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="auth-logo">Oku<span>Takip</span></div>
+  <div class="loading-text" id="loading-text">Yükleniyor…</div>
+</div>
+
 <!-- AUTH SCREEN -->
-<div id="auth-screen">
+<div id="auth-screen" style="display:none;">
   <div class="auth-card">
     <div class="auth-logo">Oku<span>Takip</span></div>
     <p class="auth-tagline">Öğrenci gelişim ve okuma takip platformu</p>
@@ -1079,11 +1111,10 @@
         <label>Şifre</label>
         <input type="password" id="login-password" placeholder="••••••••" />
       </div>
-      <button class="btn-primary" onclick="doLogin()">Giriş Yap</button>
+      <button class="btn-primary" onclick="doLogin()" id="login-btn">Giriş Yap</button>
       <div class="auth-msg" id="login-msg"></div>
-      <p style="font-size:12px;color:var(--text3);margin-top:1rem;text-align:center">
-        Demo: <strong>ogretmen@demo.com</strong> / <strong>123456</strong><br>
-        Aile: <strong>aile@demo.com</strong> / <strong>123456</strong>
+      <p style="margin-top:1rem;text-align:center">
+        <button type="button" class="link-btn" onclick="doPasswordReset()">Şifremi unuttum</button>
       </p>
     </div>
 
@@ -1106,11 +1137,11 @@
         <label>Şifre</label>
         <input type="password" id="reg-password" placeholder="En az 6 karakter" />
       </div>
-      <div class="form-group" id="student-code-field" style="display:none">
-        <label>Öğrenci Kodu (Öğretmeninizden alın)</label>
-        <input type="text" id="reg-student-code" placeholder="örn: ATA001" />
-      </div>
-      <button class="btn-primary" onclick="doRegister()">Hesap Oluştur</button>
+      <p class="form-hint" id="family-reg-hint" style="display:none;margin:-0.25rem 0 1rem;">
+        Öğretmeninizin öğrenci kaydına yazdığı e-posta adresiyle kayıt olun. Kayıttan sonra
+        e-postanıza gelen bağlantıyla adresinizi doğruladığınızda çocuğunuzun gelişimini görebilirsiniz.
+      </p>
+      <button class="btn-primary" onclick="doRegister()" id="register-btn">Hesap Oluştur</button>
       <div class="auth-msg" id="register-msg"></div>
     </div>
   </div>
@@ -1340,7 +1371,8 @@
       </div>
       <div class="form-group">
         <label>Aile E-postası (isteğe bağlı)</label>
-        <input type="email" id="new-student-family-email" placeholder="Aile uygulamaya bu e-posta ile girecek" />
+        <input type="email" id="new-student-family-email" placeholder="ornek@eposta.com" />
+        <div class="form-hint">Aile bu adresle "Aile Üyesi" olarak kayıt olup adresini doğruladığında çocuğunun gelişimini görebilir.</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1400,8 +1432,8 @@
     </div>
     <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
       <div class="form-group">
-        <label>Öğrenci</label>
-        <select id="past-student-select"></select>
+        <label id="past-student-label">Öğrenci</label>
+        <select id="past-student-select" onchange="pastTab === 'bulk' && renderBulkPreview()"></select>
       </div>
       <div class="tabs" id="past-tabs">
         <button class="tab-btn active" id="past-tab-single" onclick="switchPastTab('single')">Tek ölçüm</button>
@@ -1435,13 +1467,31 @@
 
       <div id="past-bulk" hidden>
         <div class="bulk-example">
-          Telefonunuzdaki notları aşağıya yapıştırın. Her satırda <strong>bir tarih</strong> ve <strong>okunan kelime sayısı</strong> olsun. Hata sayısı ve not isteğe bağlıdır. Örnekler:<br>
+          Telefonunuzdaki notları olduğu gibi yapıştırın. Öğrencinin adını bir satıra, altına
+          her ölçüm için <strong>tarih</strong> ve <strong>okunan kelime sayısını</strong> yazın.
+          Birden çok öğrenciyi art arda yapıştırabilirsiniz. Örnek:<br>
+          <code>Ata Kaya</code><br>
           <code>12.09.2024 58</code><br>
-          <code>03/10/2024 - 64 kelime, 3 hata</code><br>
-          <code>15 Kasım 2024 70 kelime masal kitabı</code>
+          <code>03.10.2024 64 3 hata</code><br>
+          <code>Elif Demir</code><br>
+          <code>15 Kasım 2024 70</code><br>
+          Notlarda isim yoksa satırlar yukarıda seçili öğrenciye eklenir.
         </div>
         <div class="form-group">
-          <textarea id="past-bulk-input" rows="7" placeholder="Notlarınızı buraya yapıştırın…" oninput="renderBulkPreview()"></textarea>
+          <textarea id="past-bulk-input" rows="8" placeholder="Notlarınızı buraya yapıştırın…" oninput="renderBulkPreview()"></textarea>
+        </div>
+        <div class="form-row" style="align-items:center;margin-bottom:0.5rem;">
+          <label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);flex:2;min-width:220px;">
+            <input type="checkbox" id="past-bulk-create" onchange="renderBulkPreview()" />
+            Kayıtlı olmayan isimleri yeni öğrenci olarak ekle
+          </label>
+          <select id="past-bulk-class" style="flex:1;min-width:120px;padding:8px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font);">
+            <option value="1. Sınıf">1. Sınıf</option>
+            <option value="2. Sınıf">2. Sınıf</option>
+            <option value="3. Sınıf">3. Sınıf</option>
+            <option value="4. Sınıf" selected>4. Sınıf</option>
+            <option value="5. Sınıf">5. Sınıf</option>
+          </select>
         </div>
         <div id="past-bulk-preview"></div>
       </div>
@@ -1503,54 +1553,143 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 // ══════════════════════════════════════
-// DATA STORE (localStorage)
+// FIREBASE
 // ══════════════════════════════════════
-const DB = {
-  get: k => JSON.parse(localStorage.getItem('oku_' + k) || 'null'),
-  set: (k, v) => localStorage.setItem('oku_' + k, JSON.stringify(v)),
-  getArr: k => JSON.parse(localStorage.getItem('oku_' + k) || '[]'),
+// Bu ayarlar gizli değildir, her web uygulamasında açıkça bulunur.
+// Verileri koruyan şey Firestore güvenlik kurallarıdır (firestore.rules).
+const firebaseConfig = {
+  apiKey: "AIzaSyCRRS1BpplM52nmomMo7xOP-6BrjGJB6G0",
+  authDomain: "okutakip.firebaseapp.com",
+  projectId: "okutakip",
+  storageBucket: "okutakip.firebasestorage.app",
+  messagingSenderId: "946559293665",
+  appId: "1:946559293665:web:7b480713333a0f89263fa0",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const fs = firebase.firestore();
+// Okul internetinde bağlantı kopsa da çalışmaya devam etsin; yazılanlar bağlantı gelince gönderilir
+fs.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+// ══════════════════════════════════════
+// VERİ KATMANI
+// ══════════════════════════════════════
+// Girişte kullanıcının verileri bir kez yüklenip bellekte tutulur; sayfalar buradan okur.
+// Her değişiklik önce belleğe uygulanır, ardından Firestore'a yazılır.
+const COLLECTIONS = ['students', 'readings', 'topics', 'texts'];
+let pendingWrites = 0;
+
+// Firestore'a gidecek nesneden id'yi ve tanımsız alanları ayıklar
+function clean(obj) {
+  const { id, custom, ...rest } = obj;
+  return JSON.parse(JSON.stringify(rest));
+}
+
+const Store = {
+  data: { students: [], readings: [], topics: [], texts: [] },
+
+  all(col) { return this.data[col]; },
+  get(col, id) { return this.data[col].find(x => x.id === id); },
+  newId(col) { return fs.collection(col).doc().id; },
+
+  async load(user) {
+    this.data = { students: [], readings: [], topics: [], texts: [] };
+    const isFamily = user.role === 'aile';
+    if (isFamily && !user.emailVerified) return;
+    const field = isFamily ? 'familyEmail' : 'teacherId';
+    const value = isFamily ? user.email : user.id;
+    const cols = isFamily ? ['students', 'readings', 'topics'] : COLLECTIONS;
+    await Promise.all(cols.map(async col => {
+      const snap = await fs.collection(col).where(field, '==', value).get();
+      this.data[col] = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+    }));
+  },
+
+  add(col, obj) {
+    if (!obj.id) obj.id = this.newId(col);
+    this.data[col].push(obj);
+    return this._write(fs.collection(col).doc(obj.id).set(clean(obj)));
+  },
+
+  update(col, id, patch) {
+    const item = this.get(col, id);
+    if (item) Object.assign(item, patch);
+    return this._write(fs.collection(col).doc(id).update(clean(patch)));
+  },
+
+  remove(col, id) {
+    this.data[col] = this.data[col].filter(x => x.id !== id);
+    return this._write(fs.collection(col).doc(id).delete());
+  },
+
+  // Çok sayıda değişikliği toplu yazar (Firestore tek seferde en fazla 500 işlem kabul eder)
+  batch() {
+    const ops = [];
+    const self = this;
+    return {
+      add(col, obj) {
+        if (!obj.id) obj.id = self.newId(col);
+        self.data[col].push(obj);
+        ops.push(b => b.set(fs.collection(col).doc(obj.id), clean(obj)));
+      },
+      update(col, id, patch) {
+        const item = self.get(col, id);
+        if (item) Object.assign(item, patch);
+        ops.push(b => b.update(fs.collection(col).doc(id), clean(patch)));
+      },
+      remove(col, id) {
+        self.data[col] = self.data[col].filter(x => x.id !== id);
+        ops.push(b => b.delete(fs.collection(col).doc(id)));
+      },
+      async commit() {
+        for (let i = 0; i < ops.length; i += 400) {
+          const b = fs.batch();
+          ops.slice(i, i + 400).forEach(fn => fn(b));
+          await self._write(b.commit());
+        }
+      },
+    };
+  },
+
+  async _write(promise) {
+    pendingWrites++;
+    try {
+      await promise;
+      return true;
+    } catch (e) {
+      console.error(e);
+      showToast('Kaydedilemedi: ' + firebaseError(e), 'error');
+      return false;
+    } finally {
+      pendingWrites--;
+    }
+  },
 };
 
-// Seed demo data
-function seedDemo() {
-  if (DB.get('seeded')) return;
-  const users = [
-    { id: 'u1', email: 'ogretmen@demo.com', password: '123456', name: 'Ayşe Yılmaz', role: 'ogretmen' },
-    { id: 'u2', email: 'aile@demo.com', password: '123456', name: 'Ahmet Kaya (Aile)', role: 'aile', studentCode: 'ATA001' },
-  ];
-  DB.set('users', users);
+// Kaydedilmemiş değişiklik varken sayfa kapatılmak istenirse uyar
+window.addEventListener('beforeunload', e => {
+  if (pendingWrites > 0) { e.preventDefault(); e.returnValue = ''; }
+});
 
-  const students = [
-    { id: 'ATA001', name: 'Ata Kaya', sinif: '4. Sınıf', school: 'Atatürk İlköğretim', color: 'av-green', teacherId: 'u1', familyEmail: 'aile@demo.com' },
-    { id: 'ELF001', name: 'Elif Demir', sinif: '4. Sınıf', school: 'Atatürk İlköğretim', color: 'av-blue', teacherId: 'u1', familyEmail: '' },
-    { id: 'CAN001', name: 'Can Şahin', sinif: '4. Sınıf', school: 'Atatürk İlköğretim', color: 'av-amber', teacherId: 'u1', familyEmail: '' },
-  ];
-  DB.set('students', students);
-
-  const now = Date.now();
-  const day = 86400000;
-  const readings = [
-    { id: r(), studentId: 'ATA001', wpm: 62, topic: 'Masal Kitabı', note: 'Güzel okuma', date: now - 14*day, teacherId: 'u1' },
-    { id: r(), studentId: 'ATA001', wpm: 68, topic: 'Ders Kitabı s.45', note: '', date: now - 7*day, teacherId: 'u1' },
-    { id: r(), studentId: 'ATA001', wpm: 74, topic: 'Hikaye – Küçük Prens', note: 'Hız arttı', date: now - 2*day, teacherId: 'u1' },
-    { id: r(), studentId: 'ELF001', wpm: 88, topic: 'Şiir okuma', note: '', date: now - 10*day, teacherId: 'u1' },
-    { id: r(), studentId: 'ELF001', wpm: 95, topic: 'Gazete haberi', note: 'Çok iyi', date: now - 3*day, teacherId: 'u1' },
-    { id: r(), studentId: 'CAN001', wpm: 54, topic: 'Ders kitabı', note: 'Hece zorluğu var', date: now - 5*day, teacherId: 'u1' },
-  ];
-  DB.set('readings', readings);
-
-  const topics = [
-    { id: r(), studentId: 'ATA001', lesson: 'Türkçe', name: 'Sesliler ve Sessizler', note: 'İyi biliyor', date: now - 30*day, done: true, teacherId: 'u1' },
-    { id: r(), studentId: 'ATA001', lesson: 'Türkçe', name: 'Noktalama İşaretleri', note: '', date: now - 21*day, done: true, teacherId: 'u1' },
-    { id: r(), studentId: 'ATA001', lesson: 'Matematik', name: 'Çarpma İşlemi', note: '6-7-8 çarpımlarında zorlanıyor', date: now - 14*day, done: false, teacherId: 'u1' },
-    { id: r(), studentId: 'ELF001', lesson: 'Türkçe', name: 'Fiil Zamanları', note: '', date: now - 10*day, done: true, teacherId: 'u1' },
-    { id: r(), studentId: 'ELF001', lesson: 'Matematik', name: 'Bölme İşlemi', note: '', date: now - 5*day, done: false, teacherId: 'u1' },
-    { id: r(), studentId: 'CAN001', lesson: 'Türkçe', name: 'Hece Birleştirme', note: 'Tekrar gerekiyor', date: now - 7*day, done: false, teacherId: 'u1' },
-  ];
-  DB.set('topics', topics);
-  DB.set('seeded', true);
+function firebaseError(e) {
+  const map = {
+    'auth/invalid-credential': 'E-posta veya şifre hatalı.',
+    'auth/wrong-password': 'E-posta veya şifre hatalı.',
+    'auth/user-not-found': 'Bu e-posta ile kayıtlı hesap yok.',
+    'auth/invalid-email': 'E-posta adresi geçersiz.',
+    'auth/email-already-in-use': 'Bu e-posta zaten kayıtlı.',
+    'auth/weak-password': 'Şifre en az 6 karakter olmalı.',
+    'auth/too-many-requests': 'Çok fazla deneme yapıldı. Biraz bekleyip tekrar deneyin.',
+    'auth/network-request-failed': 'İnternet bağlantısı yok.',
+    'permission-denied': 'Bu işlem için yetkiniz yok.',
+    'unavailable': 'Sunucuya ulaşılamıyor; bağlantı gelince tekrar denenecek.',
+  };
+  return map[e && e.code] || (e && e.message) || 'Bilinmeyen hata';
 }
 
 function r() { return Math.random().toString(36).substr(2, 9); }
@@ -1695,7 +1834,7 @@ Ziyaret günü bütün okul spor salonunda toplandı. Kerem Bey gezegenleri ve u
 ];
 
 function allTexts() {
-  const custom = DB.getArr('texts').filter(t => t.teacherId === (currentUser && currentUser.id)).map(t => ({ ...t, custom: true }));
+  const custom = Store.all('texts').filter(t => t.teacherId === (currentUser && currentUser.id)).map(t => ({ ...t, custom: true }));
   return BUILTIN_TEXTS.concat(custom);
 }
 
@@ -1711,11 +1850,16 @@ function countWords(body) {
 let currentUser = null;
 let selectedRole = 'ogretmen';
 
+let registering = false; // kayıt sürerken oturum dinleyicisi beklesin
+let selectedChildId = null; // birden çok çocuğu olan aile için
+
+auth.languageCode = 'tr'; // doğrulama ve şifre sıfırlama e-postaları Türkçe gelsin
+
 function selectRole(role) {
   selectedRole = role;
   document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('role-' + role).classList.add('selected');
-  document.getElementById('student-code-field').style.display = role === 'aile' ? 'block' : 'none';
+  document.getElementById('family-reg-hint').style.display = role === 'aile' ? 'block' : 'none';
 }
 
 function switchAuthTab(tab) {
@@ -1726,46 +1870,129 @@ function switchAuthTab(tab) {
   document.getElementById('panel-register').classList.toggle('active', tab === 'register');
 }
 
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value;
-  const users = DB.getArr('users');
-  const user = users.find(u => u.email === email && u.password === pass);
-  if (!user) {
-    showMsg('login-msg', 'E-posta veya şifre hatalı.', 'error');
-    return;
-  }
-  loginSuccess(user);
+function setBusy(btnId, busy) {
+  const b = document.getElementById(btnId);
+  b.disabled = busy;
+  b.style.opacity = busy ? '0.6' : '';
 }
 
-function doRegister() {
+function showLoading(text) {
+  document.getElementById('loading-text').textContent = text || 'Yükleniyor…';
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+}
+
+function showAuthScreen() {
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('login-password').value = '';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-password').value;
+  if (!email || !pass) { showMsg('login-msg', 'E-posta ve şifrenizi girin.', 'error'); return; }
+  setBusy('login-btn', true);
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    // Devamını oturum dinleyicisi (onAuthStateChanged) yapar
+  } catch (e) {
+    showMsg('login-msg', firebaseError(e), 'error');
+  } finally {
+    setBusy('login-btn', false);
+  }
+}
+
+async function doRegister() {
   const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass = document.getElementById('reg-password').value;
-  const code = document.getElementById('reg-student-code').value.trim().toUpperCase();
 
   if (!name || !email || !pass) { showMsg('register-msg', 'Tüm alanları doldurun.', 'error'); return; }
   if (pass.length < 6) { showMsg('register-msg', 'Şifre en az 6 karakter olmalı.', 'error'); return; }
 
-  const users = DB.getArr('users');
-  if (users.find(u => u.email === email)) { showMsg('register-msg', 'Bu e-posta zaten kayıtlı.', 'error'); return; }
+  setBusy('register-btn', true);
+  registering = true;
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await fs.collection('users').doc(cred.user.uid).set({ name, email, role: selectedRole, createdAt: Date.now() });
+    if (selectedRole === 'aile') await cred.user.sendEmailVerification();
+    registering = false;
+    await enterApp(cred.user);
+  } catch (e) {
+    registering = false;
+    showMsg('register-msg', firebaseError(e), 'error');
+  } finally {
+    setBusy('register-btn', false);
+  }
+}
 
-  if (selectedRole === 'aile' && code) {
-    const students = DB.getArr('students');
-    const student = students.find(s => s.id === code);
-    if (!student) { showMsg('register-msg', 'Öğrenci kodu bulunamadı.', 'error'); return; }
+async function doPasswordReset() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  if (!email) { showMsg('login-msg', 'Önce e-posta adresinizi yazın, sonra "Şifremi unuttum"a basın.', 'error'); return; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showMsg('login-msg', 'Şifre sıfırlama bağlantısı gönderildi. Gelen kutunuzu ve istenmeyen (spam) klasörünü kontrol edin.', 'success');
+  } catch (e) {
+    showMsg('login-msg', firebaseError(e), 'error');
+  }
+}
+
+// Firebase oturumundan uygulama kullanıcısını kurar ve verileri yükler
+async function enterApp(fbUser) {
+  showLoading('Verileriniz yükleniyor…');
+  const email = (fbUser.email || '').toLowerCase();
+  let profile = null;
+  try {
+    const doc = await fs.collection('users').doc(fbUser.uid).get();
+    profile = doc.exists ? doc.data() : null;
+    if (!profile) {
+      // Kayıt yarıda kaldıysa profil eksik olabilir
+      profile = { name: email.split('@')[0], email, role: 'ogretmen', createdAt: Date.now() };
+      await fs.collection('users').doc(fbUser.uid).set(profile);
+    }
+  } catch (e) {
+    showAuthScreen();
+    showMsg('login-msg', 'Hesap bilgileri alınamadı: ' + firebaseError(e), 'error');
+    return;
   }
 
-  const newUser = { id: r(), email, password: pass, name, role: selectedRole, studentCode: code || null };
-  users.push(newUser);
-  DB.set('users', users);
-  showMsg('register-msg', 'Hesap oluşturuldu! Giriş yapabilirsiniz.', 'success');
-  setTimeout(() => switchAuthTab('login'), 1500);
+  const user = { id: fbUser.uid, name: profile.name, email, role: profile.role, emailVerified: fbUser.emailVerified };
+  try {
+    await Store.load(user);
+  } catch (e) {
+    showToast('Veriler yüklenemedi: ' + firebaseError(e), 'error');
+  }
+  document.getElementById('loading-screen').style.display = 'none';
+  loginSuccess(user);
+}
+
+auth.onAuthStateChanged(fbUser => {
+  if (registering) return;
+  if (fbUser) enterApp(fbUser);
+  else showAuthScreen();
+});
+
+async function resendVerification() {
+  try {
+    await auth.currentUser.sendEmailVerification();
+    showToast('Doğrulama e-postası tekrar gönderildi ✓');
+  } catch (e) {
+    showToast(firebaseError(e), 'error');
+  }
+}
+
+async function checkVerification() {
+  await auth.currentUser.reload();
+  if (!auth.currentUser.emailVerified) { showToast('E-posta adresiniz henüz doğrulanmamış görünüyor', 'error'); return; }
+  await auth.currentUser.getIdToken(true); // güvenlik kuralları güncel doğrulama bilgisini görsün
+  await enterApp(auth.currentUser);
 }
 
 function loginSuccess(user) {
   currentUser = user;
-  DB.set('session', user.id);
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   document.getElementById('user-name-display').textContent = user.name;
@@ -1784,11 +2011,11 @@ function loginSuccess(user) {
 }
 
 function doLogout() {
+  if (pendingWrites > 0) { showToast('Değişiklikler kaydediliyor, birkaç saniye sonra tekrar deneyin', 'error'); return; }
   currentUser = null;
-  localStorage.removeItem('oku_session');
-  document.getElementById('login-password').value = '';
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
+  Store.data = { students: [], readings: [], topics: [], texts: [] };
+  closeModal('modal-student-detail');
+  auth.signOut();
 }
 
 function setupTeacherView() {
@@ -1840,19 +2067,19 @@ function showPage(name) {
 const COLORS = ['av-green', 'av-blue', 'av-amber', 'av-pink', 'av-purple', 'av-coral'];
 
 function getMyStudents() {
-  const students = DB.getArr('students');
+  const students = Store.all('students');
   if (!currentUser) return [];
   if (currentUser.role === 'ogretmen') return students.filter(s => s.teacherId === currentUser.id);
-  if (currentUser.role === 'aile' && currentUser.studentCode) return students.filter(s => s.id === currentUser.studentCode);
-  return [];
+  // Aile için yalnızca kendi e-postasına bağlı öğrenciler yüklenir
+  return students.filter(s => s.familyEmail === currentUser.email);
 }
 
 function getStudentReadings(studentId) {
-  return DB.getArr('readings').filter(r => r.studentId === studentId).sort((a, b) => a.date - b.date);
+  return Store.all('readings').filter(r => r.studentId === studentId).sort((a, b) => a.date - b.date);
 }
 
 function getStudentTopics(studentId) {
-  return DB.getArr('topics').filter(t => t.studentId === studentId).sort((a, b) => b.date - a.date);
+  return Store.all('topics').filter(t => t.studentId === studentId).sort((a, b) => b.date - a.date);
 }
 
 function formatDate(ts) {
@@ -1882,18 +2109,50 @@ function showToast(msg, type = 'success') {
 // ══════════════════════════════════════
 function renderDashboard() {
   const students = getMyStudents();
-  const allReadings = DB.getArr('readings').filter(r => students.find(s => s.id === r.studentId));
-  const allTopics = DB.getArr('topics').filter(t => students.find(s => s.id === t.studentId));
+  const allReadings = Store.all('readings').filter(r => students.find(s => s.id === r.studentId));
+  const allTopics = Store.all('topics').filter(t => students.find(s => s.id === t.studentId));
 
   const statsGrid = document.getElementById('stats-grid');
-  document.querySelectorAll('#page-dashboard .family-notice').forEach(n => n.remove());
+  const page = document.getElementById('page-dashboard');
+  page.querySelectorAll('.family-notice, .verify-card, .child-switch').forEach(n => n.remove());
 
   if (currentUser.role === 'aile') {
-    const s = students[0];
-    if (!s) {
-      statsGrid.innerHTML = '<p style="color:var(--text2)">Bağlı öğrenci bulunamadı.</p>';
+    const clear = (title, html) => {
+      document.getElementById('dashboard-title').textContent = title;
+      document.getElementById('dashboard-subtitle').textContent = '';
+      statsGrid.innerHTML = '';
       document.getElementById('dashboard-content').innerHTML = '';
+      page.insertAdjacentHTML('afterbegin', html);
+    };
+
+    if (!currentUser.emailVerified) {
+      clear('Hoş geldiniz', `<div class="verify-card">
+        <strong>E-posta adresinizi doğrulayın.</strong><br>
+        <strong>${esc(currentUser.email)}</strong> adresine bir doğrulama bağlantısı gönderdik.
+        Bağlantıya tıkladıktan sonra aşağıdaki "Doğruladım" butonuna basın.
+        E-posta gelmediyse istenmeyen (spam) klasörüne bakın.
+        <div class="header-actions">
+          <button class="btn-sm accent" onclick="checkVerification()">Doğruladım</button>
+          <button class="btn-sm" onclick="resendVerification()">Tekrar gönder</button>
+        </div>
+      </div>`);
       return;
+    }
+
+    if (!students.length) {
+      clear('Hoş geldiniz', `<div class="family-notice">ℹ️
+        <div>Bu e-posta adresine (<strong>${esc(currentUser.email)}</strong>) bağlı bir öğrenci bulunamadı.
+        Öğretmeninizden, çocuğunuzun kaydındaki "Aile E-postası" alanına bu adresi yazmasını isteyin.
+        Ekledikten sonra sayfayı yenileyin.</div>
+      </div>`);
+      return;
+    }
+
+    const s = students.find(x => x.id === selectedChildId) || students[0];
+    selectedChildId = s.id;
+    if (students.length > 1) {
+      page.insertAdjacentHTML('afterbegin', `<div class="child-switch">${students.map(c =>
+        `<button class="btn-sm ${c.id === s.id ? 'accent' : ''}" onclick="selectedChildId='${esc(c.id)}';renderDashboard()">${esc(c.name)}</button>`).join('')}</div>`);
     }
     const readings = getStudentReadings(s.id);
     const lastR = readings[readings.length - 1];
@@ -1945,6 +2204,7 @@ function renderDashboard() {
   }
 
   // TEACHER DASHBOARD
+  page.insertAdjacentHTML('afterbegin', legacyImportCard());
   document.getElementById('dashboard-title').textContent = 'Genel Bakış';
   document.getElementById('dashboard-subtitle').textContent = 'Tüm öğrencilerin durumu · ' + formatDate(Date.now());
 
@@ -2135,7 +2395,7 @@ function renderStudents() {
       <div class="student-info">
         <div class="student-name">${esc(s.name)}</div>
         <div class="student-meta">${esc(s.sinif)}${s.school ? ' · ' + esc(s.school) : ''}</div>
-        <div class="student-last">Kod: <strong>${esc(s.id)}</strong>${s.familyEmail ? ' · Aile: ' + esc(s.familyEmail) : ''}</div>
+        <div class="student-last">${s.familyEmail ? 'Aile: ' + esc(s.familyEmail) : 'Aile e-postası eklenmedi'}</div>
         ${last ? `<div style="margin-top:6px;">${normPill(last.wpm, readingGrade(last, s))}</div>` : ''}
       </div>
       <div class="wpm-badge">
@@ -2160,7 +2420,7 @@ function openAddStudent() {
 }
 
 function openEditStudent(studentId) {
-  const s = DB.getArr('students').find(st => st.id === studentId);
+  const s = Store.all('students').find(st => st.id === studentId);
   if (!s) return;
   editingStudentId = studentId;
   document.getElementById('student-modal-title').textContent = 'Öğrenciyi Düzenle';
@@ -2176,16 +2436,22 @@ function addStudent() {
   const name = document.getElementById('new-student-name').value.trim();
   const sinif = document.getElementById('new-student-class').value;
   const school = document.getElementById('new-student-school').value.trim();
-  const familyEmail = document.getElementById('new-student-family-email').value.trim();
+  const familyEmail = document.getElementById('new-student-family-email').value.trim().toLowerCase();
 
   if (!name) { showToast('Öğrenci adı girin', 'error'); return; }
-
-  const students = DB.getArr('students');
+  if (familyEmail && !/^\S+@\S+\.\S+$/.test(familyEmail)) { showToast('Aile e-postası geçersiz görünüyor', 'error'); return; }
 
   if (editingStudentId) {
-    const s = students.find(st => st.id === editingStudentId);
-    if (s) Object.assign(s, { name, sinif, school, familyEmail });
-    DB.set('students', students);
+    const s = Store.get('students', editingStudentId);
+    const oldEmail = (s && s.familyEmail) || '';
+    const b = Store.batch();
+    b.update('students', editingStudentId, { name, sinif, school, familyEmail });
+    // Ailenin görebilmesi için e-posta, öğrencinin tüm ölçüm ve konularında da tutulur
+    if (oldEmail !== familyEmail) {
+      Store.all('readings').filter(x => x.studentId === editingStudentId).forEach(x => b.update('readings', x.id, { familyEmail }));
+      Store.all('topics').filter(x => x.studentId === editingStudentId).forEach(x => b.update('topics', x.id, { familyEmail }));
+    }
+    b.commit();
     closeModal('modal-add-student');
     showToast('Öğrenci bilgileri güncellendi ✓');
     openStudentDetail(editingStudentId);
@@ -2194,20 +2460,14 @@ function addStudent() {
     return;
   }
 
-  // Kod yalnızca harf + rakamdan oluşsun ve başka öğrencinin koduyla çakışmasın
-  const prefix = initials(name, 3).replace(/[^A-ZÇĞİÖŞÜ]/g, '') || 'OGR';
-  let id;
-  do { id = prefix + Math.floor(Math.random() * 900 + 100); } while (students.some(s => s.id === id));
   const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-
-  students.push({ id, name, sinif, school, familyEmail, color, teacherId: currentUser.id });
-  DB.set('students', students);
+  Store.add('students', { name, sinif, school, familyEmail, color, teacherId: currentUser.id, createdAt: Date.now() });
 
   closeModal('modal-add-student');
   document.getElementById('new-student-name').value = '';
   document.getElementById('new-student-school').value = '';
   document.getElementById('new-student-family-email').value = '';
-  showToast(`${name} eklendi! Kodu: ${id}`);
+  showToast(`${name} eklendi ✓`);
   renderStudents();
   updateSelects();
 }
@@ -2216,7 +2476,7 @@ function addStudent() {
 // STUDENT DETAIL MODAL
 // ══════════════════════════════════════
 function openStudentDetail(studentId) {
-  const students = DB.getArr('students');
+  const students = Store.all('students');
   const s = students.find(st => st.id === studentId);
   if (!s) return;
 
@@ -2271,7 +2531,6 @@ function openStudentDetail(studentId) {
     </div>
 
     <div class="tab-panel" id="dt-info">
-      <div class="session-item"><div class="session-date" style="width:130px">Öğrenci Kodu</div><div><strong>${esc(s.id)}</strong></div></div>
       <div class="session-item"><div class="session-date" style="width:130px">Sınıf</div><div>${esc(s.sinif)}</div></div>
       <div class="session-item"><div class="session-date" style="width:130px">Okul</div><div>${esc(s.school) || '—'}</div></div>
       <div class="session-item"><div class="session-date" style="width:130px">Aile E-posta</div><div>${esc(s.familyEmail) || '—'}</div></div>
@@ -2298,25 +2557,21 @@ function switchTab(id) {
 
 function deleteReading(readingId, studentId) {
   if (!confirm('Bu ölçümü silmek istediğinizden emin misiniz?')) return;
-  const readings = DB.getArr('readings').filter(r => r.id !== readingId);
-  DB.set('readings', readings);
+  Store.remove('readings', readingId);
   refreshAfterReadingChange(studentId);
   showToast('Ölçüm silindi');
 }
 
 function toggleTopic(topicId, studentId) {
-  const topics = DB.getArr('topics');
-  const t = topics.find(t => t.id === topicId);
-  if (t) t.done = !t.done;
-  DB.set('topics', topics);
+  const t = Store.get('topics', topicId);
+  if (t) Store.update('topics', topicId, { done: !t.done });
   openStudentDetail(studentId);
   renderTopics();
 }
 
 function deleteTopic(topicId, studentId) {
   if (!confirm('Bu konuyu silmek istediğinizden emin misiniz?')) return;
-  const topics = DB.getArr('topics').filter(t => t.id !== topicId);
-  DB.set('topics', topics);
+  Store.remove('topics', topicId);
   openStudentDetail(studentId);
   renderTopics();
   showToast('Konu silindi');
@@ -2324,9 +2579,11 @@ function deleteTopic(topicId, studentId) {
 
 function deleteStudent(studentId) {
   if (!confirm('Bu öğrenciyi ve tüm verilerini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) return;
-  DB.set('students', DB.getArr('students').filter(s => s.id !== studentId));
-  DB.set('readings', DB.getArr('readings').filter(r => r.studentId !== studentId));
-  DB.set('topics', DB.getArr('topics').filter(t => t.studentId !== studentId));
+  const b = Store.batch();
+  Store.all('readings').filter(x => x.studentId === studentId).forEach(x => b.remove('readings', x.id));
+  Store.all('topics').filter(x => x.studentId === studentId).forEach(x => b.remove('topics', x.id));
+  b.remove('students', studentId);
+  b.commit();
   closeModal('modal-student-detail');
   renderStudents();
   showToast('Öğrenci silindi');
@@ -2418,15 +2675,14 @@ function saveWpmResult() {
   if (!total || total < 0) { showToast('Okunan kelime sayısını girin', 'error'); return; }
   if (errors !== null && (errors < 0 || errors > total)) { showToast('Hata sayısı okunan kelimeden fazla olamaz', 'error'); return; }
 
-  const student = DB.getArr('students').find(s => s.id === studentId);
+  const student = Store.all('students').find(s => s.id === studentId);
   const now = Date.now();
   const wpm = total - (errors || 0);
-  const readings = DB.getArr('readings');
-  readings.push({
-    id: r(), studentId, wpm, total, errors, topic, note, date: now,
-    grade: gradeAt(student, now), textId: text ? text.id : null, teacherId: currentUser.id,
+  Store.add('readings', {
+    studentId, wpm, total, errors, topic, note, date: now,
+    grade: gradeAt(student, now), textId: text ? text.id : null,
+    teacherId: currentUser.id, familyEmail: student.familyEmail || '',
   });
-  DB.set('readings', readings);
 
   showToast(`${wpm} doğru kelime/dk kaydedildi! ✓`);
   timerReset();
@@ -2437,7 +2693,7 @@ function renderReadingPage() {
   updateSelects();
   renderTextSelect();
   const students = getMyStudents();
-  const readings = DB.getArr('readings')
+  const readings = Store.all('readings')
     .filter(r => students.find(s => s.id === r.studentId))
     .sort((a, b) => b.date - a.date)
     .slice(0, 10);
@@ -2576,7 +2832,7 @@ function updateResultPreview() {
   const errors = parseInt(document.getElementById('wpm-error-input').value) || 0;
   if (!total || total < 0) { box.innerHTML = ''; return; }
   const correct = Math.max(total - errors, 0);
-  const student = DB.getArr('students').find(s => s.id === document.getElementById('timer-student-select').value);
+  const student = Store.all('students').find(s => s.id === document.getElementById('timer-student-select').value);
   box.innerHTML = `<span><b>${correct}</b> doğru kelime/dk</span>
     <span>%${Math.round(correct / total * 100)} doğruluk</span>
     ${normPill(correct, gradeAt(student, Date.now()))}`;
@@ -2596,10 +2852,8 @@ function addText() {
   if (!title || !body) { showToast('Metnin adını ve kendisini girin', 'error'); return; }
   if (countWords(body) < 20) { showToast('Metin çok kısa (en az 20 kelime)', 'error'); return; }
 
-  const texts = DB.getArr('texts');
-  const id = 'c' + r();
-  texts.push({ id, title, grade, body, teacherId: currentUser.id });
-  DB.set('texts', texts);
+  const id = Store.newId('texts');
+  Store.add('texts', { id, title, grade, body, teacherId: currentUser.id });
   closeModal('modal-add-text');
   renderTextSelect();
   document.getElementById('timer-text-select').value = id;
@@ -2611,7 +2865,7 @@ function deleteCustomText() {
   const t = currentText();
   if (!t || !t.custom) return;
   if (!confirm(`"${t.title}" metnini silmek istediğinizden emin misiniz?`)) return;
-  DB.set('texts', DB.getArr('texts').filter(x => x.id !== t.id));
+  Store.remove('texts', t.id);
   document.getElementById('timer-text-select').value = '';
   renderTextSelect();
   onTextSelect();
@@ -2642,6 +2896,7 @@ function switchPastTab(tab) {
   document.getElementById('past-single').hidden = tab !== 'single';
   document.getElementById('past-bulk').hidden = tab !== 'bulk';
   document.getElementById('past-save-btn').textContent = editingReadingId ? 'Kaydet' : tab === 'bulk' ? 'Hepsini Ekle' : 'Ekle';
+  document.getElementById('past-student-label').textContent = tab === 'bulk' ? 'Öğrenci (notlarda isim yoksa)' : 'Öğrenci';
   if (tab === 'bulk') renderBulkPreview();
 }
 
@@ -2654,12 +2909,13 @@ function openPastReading(studentId) {
   dateEl.max = toDateInput(Date.now());
   dateEl.value = '';
   ['past-total', 'past-errors', 'past-topic', 'past-note', 'past-bulk-input'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('past-bulk-create').checked = false;
   switchPastTab('single');
   document.getElementById('modal-past-reading').classList.add('open');
 }
 
 function openEditReading(readingId) {
-  const rd = DB.getArr('readings').find(x => x.id === readingId);
+  const rd = Store.all('readings').find(x => x.id === readingId);
   if (!rd) return;
   editingReadingId = readingId;
   document.getElementById('past-modal-title').textContent = 'Ölçümü Düzenle';
@@ -2720,47 +2976,121 @@ function parseBulkLine(line) {
   return { line: s, date: dateObj.getTime(), total, errors, note };
 }
 
+const normName = s => String(s || '').toLocaleLowerCase('tr').replace(/\s+/g, ' ').trim();
+
+// Notları okur. Rakam içermeyen kısa bir satır öğrenci adıdır; altındaki tarih satırları
+// o öğrenciye aittir. "Ata Kaya 12.09.2024 58" gibi tek satırlık yazım da tanınır.
 function parseBulk(text) {
-  return text.split(/\r?\n/).map(parseBulkLine).filter(Boolean);
+  const students = getMyStudents();
+  const rows = [];
+  let group = null;
+  text.split(/\r?\n/).forEach(raw => {
+    const line = raw.trim();
+    if (!line) return;
+    if (!/\d/.test(line) && line.split(/\s+/).length <= 5) {
+      const name = line.replace(/[:\-–—]+$/, '').trim();
+      group = { name, student: students.find(s => normName(s.name) === normName(name)) || null };
+      return;
+    }
+    const x = parseBulkLine(line);
+    if (!x) return;
+    x.group = group;
+    if (!x.error && x.note) {
+      const hit = students.find(s => (normName(x.note) + ' ').startsWith(normName(s.name) + ' '));
+      if (hit) {
+        x.group = { name: hit.name, student: hit };
+        x.note = x.note.split(' ').slice(normName(hit.name).split(' ').length).join(' ');
+      }
+    }
+    rows.push(x);
+  });
+  return rows;
+}
+
+// Her satırın hangi öğrenciye ekleneceğini belirler
+function bulkPlan() {
+  const rows = parseBulk(document.getElementById('past-bulk-input').value);
+  const fallback = Store.get('students', document.getElementById('past-student-select').value) || null;
+  const createNew = document.getElementById('past-bulk-create').checked;
+  return rows.map(row => {
+    if (row.error) return { row, problem: row.error };
+    if (row.group) {
+      if (row.group.student) return { row, target: row.group.student };
+      if (createNew) return { row, target: { newName: row.group.name } };
+      return { row, problem: `"${row.group.name}" adlı öğrenci kayıtlı değil` };
+    }
+    if (fallback) return { row, target: fallback };
+    return { row, problem: 'Hangi öğrenciye ait olduğu belli değil' };
+  });
 }
 
 function renderBulkPreview() {
-  const rows = parseBulk(document.getElementById('past-bulk-input').value);
+  const plan = bulkPlan();
   const box = document.getElementById('past-bulk-preview');
-  if (!rows.length) { box.innerHTML = ''; return; }
-  const ok = rows.filter(x => !x.error);
-  const bad = rows.length - ok.length;
-  box.innerHTML = `<div class="bulk-summary"><strong>${ok.length}</strong> ölçüm eklenecek${bad ? ` · <span style="color:var(--danger)">${bad} satır anlaşılamadı, atlanacak</span>` : ''}</div>
-    ${rows.map(x => x.error
-      ? `<div class="bulk-row bad"><span>⚠ ${esc(x.error)}</span><span>${esc(x.line)}</span></div>`
-      : `<div class="bulk-row"><span>${formatDate(x.date)}</span><span><strong>${x.total}</strong> kelime${x.errors !== null ? ' · ' + x.errors + ' hata' : ''}${x.note ? ' · ' + esc(x.note) : ''}</span></div>`
+  if (!plan.length) { box.innerHTML = ''; return; }
+
+  const ok = plan.filter(p => p.target);
+  const bad = plan.length - ok.length;
+  const perStudent = {};
+  ok.forEach(p => {
+    const n = p.target.newName || p.target.name;
+    perStudent[n] = (perStudent[n] || 0) + 1;
+  });
+  const newNames = [...new Set(ok.filter(p => p.target.newName).map(p => p.target.newName))];
+
+  box.innerHTML = `<div class="bulk-summary">
+      <strong>${ok.length}</strong> ölçüm eklenecek${Object.keys(perStudent).length ? ': ' + Object.entries(perStudent).map(([n, c]) => `${esc(n)} (${c})`).join(', ') : ''}
+      ${newNames.length ? `<br>Yeni öğrenci olarak eklenecek: <strong>${newNames.map(esc).join(', ')}</strong>` : ''}
+      ${bad ? `<br><span style="color:var(--danger)">${bad} satır atlanacak</span>` : ''}
+    </div>
+    ${plan.map(p => p.problem
+      ? `<div class="bulk-row bad"><span>⚠ ${esc(p.problem)}</span><span>${esc(p.row.line)}</span></div>`
+      : `<div class="bulk-row"><span>${formatDate(p.row.date)}</span><span>${esc(p.target.newName || p.target.name)} · <strong>${p.row.total}</strong> kelime${p.row.errors !== null ? ' · ' + p.row.errors + ' hata' : ''}${p.row.note ? ' · ' + esc(p.row.note) : ''}</span></div>`
     ).join('')}`;
 }
 
 function makeReading(student, x) {
   return {
-    id: r(), studentId: student.id, wpm: x.total - (x.errors || 0), total: x.total, errors: x.errors,
+    studentId: student.id, wpm: x.total - (x.errors || 0), total: x.total, errors: x.errors,
     topic: x.topic || '', note: x.note || '', date: x.date, grade: gradeAt(student, x.date),
-    textId: null, teacherId: currentUser.id,
+    textId: null, teacherId: currentUser.id, familyEmail: student.familyEmail || '',
   };
 }
 
 function savePastReading() {
-  const studentId = document.getElementById('past-student-select').value;
-  if (!studentId) { showToast('Öğrenci seçin', 'error'); return; }
-  const student = DB.getArr('students').find(s => s.id === studentId);
-  const readings = DB.getArr('readings');
-
   if (pastTab === 'bulk' && !editingReadingId) {
-    const rows = parseBulk(document.getElementById('past-bulk-input').value).filter(x => !x.error);
-    if (!rows.length) { showToast('Eklenecek geçerli satır yok', 'error'); return; }
-    rows.forEach(x => readings.push(makeReading(student, x)));
-    DB.set('readings', readings);
+    const ok = bulkPlan().filter(p => p.target);
+    if (!ok.length) { showToast('Eklenecek geçerli satır yok', 'error'); return; }
+    const sinif = document.getElementById('past-bulk-class').value;
+    const b = Store.batch();
+    const created = new Map();
+    ok.forEach(p => {
+      let st = p.target;
+      if (st.newName) {
+        const key = normName(st.newName);
+        if (!created.has(key)) {
+          const ns = {
+            id: Store.newId('students'), name: st.newName, sinif, school: '', familyEmail: '',
+            color: COLORS[created.size % COLORS.length], teacherId: currentUser.id, createdAt: Date.now(),
+          };
+          b.add('students', ns);
+          created.set(key, ns);
+        }
+        st = created.get(key);
+      }
+      b.add('readings', makeReading(st, p.row));
+    });
+    b.commit();
     closeModal('modal-past-reading');
-    showToast(`${rows.length} geçmiş ölçüm eklendi ✓`);
-    refreshAfterReadingChange(studentId);
+    showToast(`${ok.length} geçmiş ölçüm eklendi${created.size ? `, ${created.size} yeni öğrenci oluşturuldu` : ''} ✓`);
+    refreshAfterReadingChange();
+    updateSelects();
     return;
   }
+
+  const studentId = document.getElementById('past-student-select').value;
+  if (!studentId) { showToast('Öğrenci seçin', 'error'); return; }
+  const student = Store.get('students', studentId);
 
   const dateStr = document.getElementById('past-date').value;
   const total = parseInt(document.getElementById('past-total').value);
@@ -2779,19 +3109,15 @@ function savePastReading() {
   };
 
   if (editingReadingId) {
-    const rd = readings.find(z => z.id === editingReadingId);
-    if (rd) {
-      const fresh = makeReading(student, x);
-      Object.assign(rd, { ...fresh, id: rd.id, textId: rd.textId || null });
-    }
+    const old = Store.get('readings', editingReadingId);
+    Store.update('readings', editingReadingId, { ...makeReading(student, x), textId: (old && old.textId) || null });
     showToast('Ölçüm güncellendi ✓');
   } else {
-    readings.push(makeReading(student, x));
+    Store.add('readings', makeReading(student, x));
     showToast('Geçmiş ölçüm eklendi ✓');
   }
-  DB.set('readings', readings);
   closeModal('modal-past-reading');
-  refreshAfterReadingChange(studentId);
+  refreshAfterReadingChange();
 }
 
 // ══════════════════════════════════════
@@ -2810,9 +3136,11 @@ function addTopic() {
 
   if (!studentId || !name) { showToast('Öğrenci ve konu adı zorunlu', 'error'); return; }
 
-  const topics = DB.getArr('topics');
-  topics.push({ id: r(), studentId, lesson, name, note, date: Date.now(), done: false, teacherId: currentUser.id });
-  DB.set('topics', topics);
+  const student = Store.get('students', studentId);
+  Store.add('topics', {
+    studentId, lesson, name, note, date: Date.now(), done: false,
+    teacherId: currentUser.id, familyEmail: (student && student.familyEmail) || '',
+  });
 
   closeModal('modal-add-topic');
   document.getElementById('topic-name-input').value = '';
@@ -2833,7 +3161,7 @@ function renderTopics() {
   const currentSF = sf.value;
   sf.innerHTML = '<option value="">Tüm öğrenciler</option>' + students.map(s => `<option value="${esc(s.id)}" ${s.id === currentSF ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
 
-  let topics = DB.getArr('topics').filter(t => students.find(s => s.id === t.studentId));
+  let topics = Store.all('topics').filter(t => students.find(s => s.id === t.studentId));
   if (studentFilter) topics = topics.filter(t => t.studentId === studentFilter);
   if (lessonFilter) topics = topics.filter(t => t.lesson === lessonFilter);
   topics.sort((a, b) => b.date - a.date);
@@ -2867,10 +3195,9 @@ function renderTopics() {
 }
 
 function toggleTopicDirect(topicId) {
-  const topics = DB.getArr('topics');
-  const t = topics.find(t => t.id === topicId);
-  if (t) t.done = !t.done;
-  DB.set('topics', topics);
+  const t = Store.get('topics', topicId);
+  if (!t) return;
+  Store.update('topics', topicId, { done: !t.done });
   renderTopics();
   showToast(t.done ? 'Tamamlandı olarak işaretlendi ✓' : 'Tamamlanmadı olarak işaretlendi');
 }
@@ -2911,12 +3238,74 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 // ══════════════════════════════════════
 // INIT
 // ══════════════════════════════════════
-seedDemo();
+// Oturum Firebase tarafından hatırlanır; açılışta onAuthStateChanged girişi tamamlar.
 
-// Sayfa yenilendiğinde oturumu koru
-const savedSession = DB.get('session');
-const savedUser = savedSession && DB.getArr('users').find(u => u.id === savedSession);
-if (savedUser) loginSuccess(savedUser);
+// ══════════════════════════════════════
+// ESKİ VERİLERİ AKTARMA
+// ══════════════════════════════════════
+// Firebase'e geçmeden önce kayıtlar bu tarayıcının localStorage'ında tutuluyordu.
+function legacyData() {
+  try {
+    const get = k => JSON.parse(localStorage.getItem('oku_' + k) || '[]');
+    if (localStorage.getItem('oku_imported')) return null;
+    const students = get('students'), readings = get('readings'), topics = get('topics'), texts = get('texts');
+    if (!students.length) return null;
+    return { students, readings, topics, texts };
+  } catch (e) {
+    return null;
+  }
+}
+
+function legacyImportCard() {
+  const d = legacyData();
+  if (!d || currentUser.role !== 'ogretmen') return '';
+  return `<div class="verify-card" id="legacy-card">
+    <strong>Bu tarayıcıda eski kayıtlar bulundu.</strong>
+    ${d.students.length} öğrenci, ${d.readings.length} okuma ölçümü ve ${d.topics.length} konu.
+    <div style="margin-top:4px;font-size:13px;">Öğrenciler: ${d.students.map(s => esc(s.name)).join(', ')}</div>
+    <div style="margin-top:4px;font-size:13px;">Aktarırsanız hesabınıza eklenir; istemediklerinizi sonra silebilirsiniz.</div>
+    <div class="header-actions">
+      <button class="btn-sm accent" onclick="importLegacy()">Hesabıma aktar</button>
+      <button class="btn-sm" onclick="dismissLegacy()">Aktarma, bir daha sorma</button>
+    </div>
+  </div>`;
+}
+
+function dismissLegacy() {
+  try { localStorage.setItem('oku_imported', 'skip'); } catch (e) {}
+  const c = document.getElementById('legacy-card');
+  if (c) c.remove();
+}
+
+async function importLegacy() {
+  const d = legacyData();
+  if (!d) return;
+  const b = Store.batch();
+  const idMap = {};
+  d.students.forEach(s => {
+    const id = Store.newId('students');
+    idMap[s.id] = id;
+    b.add('students', {
+      id, name: s.name, sinif: s.sinif, school: s.school || '', familyEmail: (s.familyEmail || '').toLowerCase(),
+      color: s.color || COLORS[0], teacherId: currentUser.id, createdAt: Date.now(),
+    });
+  });
+  const famOf = sid => (d.students.find(s => s.id === sid)?.familyEmail || '').toLowerCase();
+  d.readings.filter(x => idMap[x.studentId]).forEach(x => b.add('readings', {
+    studentId: idMap[x.studentId], wpm: x.wpm, total: x.total ?? x.wpm, errors: x.errors ?? null,
+    topic: x.topic || '', note: x.note || '', date: x.date, grade: x.grade ?? null, textId: x.textId || null,
+    teacherId: currentUser.id, familyEmail: famOf(x.studentId),
+  }));
+  d.topics.filter(x => idMap[x.studentId]).forEach(x => b.add('topics', {
+    studentId: idMap[x.studentId], lesson: x.lesson, name: x.name, note: x.note || '', date: x.date, done: !!x.done,
+    teacherId: currentUser.id, familyEmail: famOf(x.studentId),
+  }));
+  d.texts.forEach(x => b.add('texts', { title: x.title, grade: x.grade, body: x.body, teacherId: currentUser.id }));
+  await b.commit();
+  try { localStorage.setItem('oku_imported', 'done'); } catch (e) {}
+  showToast('Eski kayıtlar hesabınıza aktarıldı ✓');
+  refreshCurrentPage();
+}
 
 // Keyboard shortcut: Enter on login
 document.addEventListener('keydown', e => {
